@@ -136,6 +136,30 @@
           height: elmt.offsetHeight || 0
         };
       },
+      // Function to parse a url.
+      parseUrl = url => {
+        if (!url || typeof url !== 'string') return null;
+        if (URL.canParse && !URL.canParse(url)) return { href: url };
+        url = new URL(url);
+        const output = {
+          href: url.href // Full url
+        };
+        url.hostname && (output.hostname = url.hostname);
+        url.pathname && (output.pathname = url.pathname);
+        url.hash && (output.hash = url.hash);
+        url.password && (output.password = url.password);
+        url.port && (output.port = url.port);
+        url.protocal && (output.protocal = url.protocal);
+        url.username && (output.username = url.username);
+        url.searchParams.size && (output.searchParams = Array.from(Array.from(url.searchParams).reduce((m, [k, v]) => {
+          let c = m.get(k);
+          c === undefined || Array.isArray(c) || (c = [c]);
+          c && (c.push(v));
+          m.set(k, c || v);
+          return m;
+        }, new Map)));
+        return output;
+      },
 
       // Helper function to get the metadata.
       getMetadata = elmt => {
@@ -149,15 +173,13 @@
             isApple: IS_APPLE,
             language: NAVIGATOR.language
           },
-          href: LOCATION.href,
+          location: parseUrl(LOCATION.href),
           date: Date.now(),
           timeZoneOffset: TIMEZONE_OFFSET,
           sessionId: SESSION_ID,
-          location: LOCATION,
-          title: DOCUMENT.title,
-                    
+          title: DOCUMENT.title
         };
-        DOCUMENT.referrer && (data.referrer = DOCUMENT.referrer);
+        DOCUMENT.referrer && (data.referrer = parseUrl(DOCUMENT.referrer));
 
         // Not supported by IE yet.
         try {
@@ -165,7 +187,7 @@
           tz && (data.timeZone = tz);
         } catch { };
 
-        if (elmt instanceof Node) {
+        if (elmt instanceof Node && typeof elmt.getAttribute === 'function') {
           let el = data.element = getElementBox(elmt), i,
             id = elmt.getAttribute('id') || elmt.id
               || elmt.getAttribute('name') || elmt.name
@@ -210,10 +232,12 @@
           ///////////////////////////
           // @Tristan to ping the db
 
-          const uri = 'https://angel-api.zorp.xyz/api/event'
+          const uri = 'https://api.angelytics.ai/api/event';
 
           sendPostRequest = () => {
-            console.log("sending data to server...")
+            // @Tristan: remove the console.log for production
+            console.log('sending data to server...', data);
+            ///////
             return fetch(uri, {
               method: 'POST',
               headers: {
@@ -233,11 +257,7 @@
                 console.error(error);
               });
           }
-
-          sendPostRequest()
-
-          // console.log('Recorded', data);
-
+          sendPostRequest();
         })),
       SESSION_NAME = `${PREFIX}-session-id`,
       SESSION_ID = STORAGE && function (id = STORAGE.getItem(SESSION_NAME) || '') {
