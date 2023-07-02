@@ -236,7 +236,7 @@
 
           sendPostRequest = () => {
             // @Tristan: remove the console.log for production
-            console.log('sending data to server...', data);
+            // console.log('sending data to server...', data);
             ///////
             return fetch(uri, {
               method: 'POST',
