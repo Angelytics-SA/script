@@ -42,17 +42,30 @@
       // Get current script parameters.
       scripts = DOCUMENT.getElementsByTagName && DOCUMENT.getElementsByTagName('script'),
       script = scripts[scripts.length - 1],
-      KEY = script && (
+      ENCRYPTION_KEY = script && (
         script.getAttribute('apikey')
         || script.getAttribute('key')
-        || script.getAttribute('userkey')
+        || script.getAttribute('publickey')
         || script.getAttribute('api-key')
         || script.getAttribute('public-key')
-        || script.getAttribute('user-key')
         || script.getAttribute('data-api-key')
         || script.getAttribute('data-key')
-        || script.getAttribute('data-user-key')
         || script.getAttribute('data-public-key')
+      ),
+      ACCOUNT_ID = script && (
+        script.getAttribute('userkey')
+        || script.getAttribute('user-key')
+        || script.getAttribute('data-user-key')
+        || script.getAttribute('userid')
+        || script.getAttribute('user-id')
+        || script.getAttribute('data-user-id')
+        || script.getAttribute('user')
+        || script.getAttribute('data-user')
+        || script.getAttribute('account')
+        || script.getAttribute('data-account')
+        || script.getAttribute('accountid')
+        || script.getAttribute('account-id')
+        || script.getAttribute('data-account-id')
       ),
       NAMESPACE = script.getAttribute('namespace') || 'angelitics',
       CB = script.getAttribute('callback')
@@ -672,17 +685,17 @@
 
       // Function to send data to servers.
       send = CB && typeof WINDOW[CB] === 'function' && ((...data) => WINDOW[CB].apply(WINDOW, data))
-        || (KEY && (async (
+        || (ACCOUNT_ID && (async (
           data, // data to send
           uri = 'https://api.angelytics.ai/api/event', // where to send it
-          encryptData = false // if true, will encrypt using ECC Secp256k1 Encryption (aka Bitcoin encryption)
+          encryptionKey = ENCRYPTION_KEY // if true, will encrypt using ECC Secp256k1 Encryption (aka Bitcoin encryption)
         ) => {
           // @Tristan: remove the console.log for production
           // console.log('sending data to server...', data);
 
           // Encrypt the data if needed.
           try {
-            data = encryptData && encrypt(data) || JSON.stringify(data);
+            data = encryptionKey && encrypt(data, encryptionKey) || JSON.stringify(data);
           } catch (error) {
             // Could not encrypt the message.
             // It can happen with a probability of 1 / (2^256)
@@ -748,7 +761,7 @@
         eventName && (data.eventName = eventName);
         body && (data.body = body);
         (typeof userId === 'number' || userId) && (data.userId = typeof userId === 'object' && JSON.stringify(userId) || `${userId}`);
-        data.apiKey = KEY;
+        data.accountId = ACCOUNT_ID;
 
         // Send data.
         send(data);
