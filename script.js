@@ -695,7 +695,13 @@
 
           // Encrypt the data if needed.
           try {
-            data = encryptionKey && encrypt(data, encryptionKey) || JSON.stringify(data);
+            data = JSON.stringify(encryptionKey && ({
+              accountId: ACCOUNT_ID,
+              data: encrypt(data, encryptionKey),
+            }) || ({
+              accountId: ACCOUNT_ID,
+              ...data,
+            }));
           } catch (error) {
             // Could not encrypt the message.
             // It can happen with a probability of 1 / (2^256)
@@ -761,7 +767,6 @@
         eventName && (data.eventName = eventName);
         body && (data.body = body);
         (typeof userId === 'number' || userId) && (data.userId = typeof userId === 'object' && JSON.stringify(userId) || `${userId}`);
-        data.accountId = ACCOUNT_ID;
 
         // Send data.
         send(data);
