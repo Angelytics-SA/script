@@ -673,9 +673,9 @@
       // Function to send data to servers.
       send = CB && typeof WINDOW[CB] === 'function' && ((...data) => WINDOW[CB].apply(WINDOW, data))
         || (KEY && (async (
-          data,
-          uri = 'https://api.angelytics.ai/api/event',
-          encryptData = false
+          data, // data to send
+          uri = 'https://api.angelytics.ai/api/event', // where to send it
+          encryptData = false // if true, will encrypt using ECC Secp256k1 Encryption (aka Bitcoin encryption)
         ) => {
           // @Tristan: remove the console.log for production
           // console.log('sending data to server...', data);
