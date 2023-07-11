@@ -808,7 +808,7 @@
               scrollPercentageX: Math.round(100 * node.scrollLeft / Math.max((node.scrollWidth - node.clientWidth), 1)),
               scrollPercentageY: Math.round(100 * node.scrollTop / Math.max((node.scrollHeight - node.clientHeight), 1)),
             }, node, null, 'gesture')
-          }, 1000)),
+          }, 2000)),
         onload = () => {
           let node = document.body, queue = [node];
           while (node = queue.pop()) {
