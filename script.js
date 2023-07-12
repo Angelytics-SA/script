@@ -692,7 +692,7 @@
           _ek = encryptionKey && typeof encryptionKey !== 'string' && ENCRYPTION_KEY || encryptionKey
         ) => {
           // @Tristan: remove the console.log for production
-          console.log('sending data to server...', data);
+          // console.log('sending data to server...', data);
 
           // Encrypt the data if needed.
           data = {
