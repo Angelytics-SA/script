@@ -20,98 +20,98 @@
 
 (() => {
   // Get browser objects.
-  let WINDOW, NAVIGATOR, DOCUMENT, MQ, MOBILE, IS_APPLE, STORAGE, LOCATION, TIMEZONE_OFFSET = Math.round((new Date).getTimezoneOffset() / 60);
+  let WIN, NAV, DOC, MQ, MOB, IS_APPLE, STO, LOC, TZO = Math.round((new Date).getTimezoneOffset() / 60);
   try {
-    WINDOW = window;
-    NAVIGATOR = WINDOW.navigator || navigator;
-    DOCUMENT = WINDOW.document || document;
-    LOCATION = WINDOW.location || location;
+    WIN = window;
+    NAV = WIN.navigator || navigator;
+    DOC = WIN.document || document;
+    LOC = WIN.location || location;
   } catch { };
 
   // We need the basics to make the code work.
-  if (WINDOW && NAVIGATOR && DOCUMENT) {
+  if (WIN && NAV && DOC) {
 
     // Get storage.
     try {
-      STORAGE = sessionStorage;
+      STO = sessionStorage;
     } catch { }
 
     // Prefix storage variables.
     const PREFIX = 'aglx',
 
       // Get current script parameters.
-      scripts = DOCUMENT.getElementsByTagName && DOCUMENT.getElementsByTagName('script'),
-      script = scripts[scripts.length - 1],
-      ENCRYPTION_KEY = script && (
-        script.getAttribute('apikey')
-        || script.getAttribute('key')
-        || script.getAttribute('publickey')
-        || script.getAttribute('api-key')
-        || script.getAttribute('public-key')
-        || script.getAttribute('data-api-key')
-        || script.getAttribute('data-key')
-        || script.getAttribute('data-public-key')
+      scs = DOC.getElementsByTagName && DOC.getElementsByTagName('script'),
+      sc = scs[scs.length - 1],
+      EK = sc && ( // Encryption key
+        sc.getAttribute('apikey')
+        || sc.getAttribute('key')
+        || sc.getAttribute('publickey')
+        || sc.getAttribute('api-key')
+        || sc.getAttribute('public-key')
+        || sc.getAttribute('data-api-key')
+        || sc.getAttribute('data-key')
+        || sc.getAttribute('data-public-key')
       ),
-      ACCOUNT_ID = script && (
-        script.getAttribute('userkey')
-        || script.getAttribute('user-key')
-        || script.getAttribute('data-user-key')
-        || script.getAttribute('userid')
-        || script.getAttribute('user-id')
-        || script.getAttribute('data-user-id')
-        || script.getAttribute('user')
-        || script.getAttribute('data-user')
-        || script.getAttribute('account')
-        || script.getAttribute('data-account')
-        || script.getAttribute('accountid')
-        || script.getAttribute('account-id')
-        || script.getAttribute('data-account-id')
+      A = sc && ( // Account id
+        sc.getAttribute('userkey')
+        || sc.getAttribute('user-key')
+        || sc.getAttribute('data-user-key')
+        || sc.getAttribute('userid')
+        || sc.getAttribute('user-id')
+        || sc.getAttribute('data-user-id')
+        || sc.getAttribute('user')
+        || sc.getAttribute('data-user')
+        || sc.getAttribute('account')
+        || sc.getAttribute('data-account')
+        || sc.getAttribute('accountid')
+        || sc.getAttribute('account-id')
+        || sc.getAttribute('data-account-id')
       ),
-      NAMESPACE = script.getAttribute('namespace') || 'angelitics',
-      CB = script.getAttribute('callback')
-        || script.getAttribute('cb')
-        || script.getAttribute('data-callback')
-        || script.getAttribute('data-cb'),
+      NAMESPACE = sc.getAttribute('namespace') || 'angelitics',
+      CB = sc.getAttribute('callback')
+        || sc.getAttribute('cb')
+        || sc.getAttribute('data-callback')
+        || sc.getAttribute('data-cb'),
 
       // Get system parameters.
-      // MOBILE: ios | android | windows | other | false
+      // MOB: ios | android | windows | other | false
       // BROWSER: chrome | chromium | seamonkey | firefox | opera | ie | false
       // RENDERING_ENGINE: blink | gecko | webkit | false
       // DEVICE_TYPE: phone | tablet | large-tablet | desktop
       // IS_APPLE: true | false
       // HAS_TOUCH_SCREEN: true | false
-      VENDOR = NAVIGATOR.vendor || '',
-      USER_AGENT = NAVIGATOR.userAgent || '',
-      IS_ANDROID_MOBILE = /Android|Opera Mini/.test(USER_AGENT) || WINDOW.Android || false,
-      IS_WINDOWS_MOBILE = /Windows Phone|IEMobile/.test(USER_AGENT),
-      IS_OTHER_MOBILE = /webOS|BlackBerry/.test(USER_AGENT),
-      IS_IOS_MOBILE = /iP(hone|ad|od)/.test(USER_AGENT)
-        && WINDOW.webkit
-        && !(IS_ANDROID_MOBILE || IS_WINDOWS_MOBILE || IS_OTHER_MOBILE);
-    MOBILE = (IS_IOS_MOBILE && 'ios')
-      || (IS_ANDROID_MOBILE && 'android')
-      || (IS_WINDOWS_MOBILE && 'windows')
-      || (IS_OTHER_MOBILE && 'other');
-    const HAS_TOUCH_SCREEN = !!MOBILE
-      || NAVIGATOR.maxTouchPoints > 0
-      || NAVIGATOR.msMaxTouchPoints > 0
+      VENDOR = NAV.vendor || '',
+      USER_AGENT = NAV.userAgent || '',
+      IS_ANDROID_MOB = /Android|Opera Mini/.test(USER_AGENT) || WIN.Android || false,
+      IS_WINS_MOB = /Windows Phone|IEMobile/.test(USER_AGENT),
+      IS_OTHER_MOB = /webOS|BlackBerry/.test(USER_AGENT),
+      IS_IOS_MOB = /iP(hone|ad|od)/.test(USER_AGENT)
+        && WIN.webkit
+        && !(IS_ANDROID_MOB || IS_WINS_MOB || IS_OTHER_MOB);
+    MOB = (IS_IOS_MOB && 'ios')
+      || (IS_ANDROID_MOB && 'android')
+      || (IS_WINS_MOB && 'windows')
+      || (IS_OTHER_MOB && 'other');
+    const HAS_TOUCH_SCREEN = !!MOB
+      || NAV.maxTouchPoints > 0
+      || NAV.msMaxTouchPoints > 0
       || (
-        (MQ = ((WINDOW.matchMedia || (() => { }))('(pointer:coarse)') || {}))
+        (MQ = ((WIN.matchMedia || (() => { }))('(pointer:coarse)') || {}))
         && MQ.media === '(pointer:coarse)'
         && !!MQ.matches
-      ) || !!WINDOW.orientation;
-    HAS_TOUCH_SCREEN || (MOBILE = false);
+      ) || !!WIN.orientation;
+    HAS_TOUCH_SCREEN || (MOB = false);
 
     IS_APPLE = /Apple/.test(VENDOR);
     const IS_SAFARI = /Safari/.test(USER_AGENT) && IS_APPLE;
     IS_APPLE || (IS_APPLE = /Mac/.test(USER_AGENT));
     const IS_GOOGLE = /Google/.test(VENDOR),
       IS_CHROMIUM = /Chromium/.test(USER_AGENT) && IS_GOOGLE,
-      IS_CHROME = ((/Chrome/.test(USER_AGENT) && IS_GOOGLE) || (WINDOW.chrome && (WINDOW.chrome.webstore || WINDOW.chrome.runtime))) && !IS_CHROMIUM,
+      IS_CHROME = ((/Chrome/.test(USER_AGENT) && IS_GOOGLE) || (WIN.chrome && (WIN.chrome.webstore || WIN.chrome.runtime))) && !IS_CHROMIUM,
       IS_SEAMONKEY = /Seamonkey/.test(USER_AGENT),
       IS_FIREFOX = (/Firefox/.test(USER_AGENT) || typeof InstallTrigger !== 'undefined') && !IS_SEAMONKEY,
       IS_OPERA = /OPR|Opera/.test(USER_AGENT),
-      IS_IE = /MSIE|Trident.*rv\:11\./.test(USER_AGENT) || /*@cc_on!@*/false || !!DOCUMENT.documentMode,
+      IS_IE = /MSIE|Trident.*rv\:11\./.test(USER_AGENT) || /*@cc_on!@*/false || !!DOC.documentMode,
       BROWSER = (IS_SAFARI && 'safari')
         || (IS_CHROME && 'chrome')
         || (IS_CHROMIUM && 'chromium')
@@ -120,15 +120,15 @@
         || (IS_OPERA && 'opera')
         || (IS_IE && 'ie'),
       IS_GECKO = /Mobile|Tablet/.test(USER_AGENT) && /Gecko|Firefox/.test(USER_AGENT) && /Mozilla/.test(USER_AGENT) || IS_FIREFOX,
-      IS_EDGE = (!IS_IE && !!WINDOW.StyleMedia) || (IS_CHROME && /Edg/.test(USER_AGENT)),
-      IS_BLINK = (IS_CHROME || IS_OPERA) && !!WINDOW.CSS,
+      IS_EDGE = (!IS_IE && !!WIN.StyleMedia) || (IS_CHROME && /Edg/.test(USER_AGENT)),
+      IS_BLINK = (IS_CHROME || IS_OPERA) && !!WIN.CSS,
       IS_WEBKIT = /KHTML/.test(USER_AGENT) && /AppleWebKit/.test(USER_AGENT),
       RENDERING_ENGINE = (IS_EDGE && 'edge')
         || (IS_BLINK && 'blink')
         || (IS_GECKO && 'gecko')
         || (IS_WEBKIT && 'webkit'),
-      WIDTH = WINDOW.innerWidth || WINDOW.documentElement.clientWidth,
-      DEVICE_TYPE = MOBILE && (
+      WIDTH = WIN.innerWidth || WIN.documentElement.clientWidth,
+      DEVICE_TYPE = MOB && (
         (WIDTH < 480 && 'phone')
         || (WIDTH > 1152 && 'large-tablet')
         || (WIDTH && 'tablet')
@@ -181,18 +181,18 @@
             browser: BROWSER,
             renderingEngine: RENDERING_ENGINE,
             deviceType: DEVICE_TYPE,
-            isMobile: MOBILE,
+            isMobile: MOB,
             hasTouchScreen: HAS_TOUCH_SCREEN,
             isApple: IS_APPLE,
-            language: NAVIGATOR.language
+            language: NAV.language
           },
-          location: parseUrl(LOCATION.href),
+          location: parseUrl(LOC.href),
           date: Date.now(),
-          timeZoneOffset: TIMEZONE_OFFSET,
-          sessionId: SESSION_ID,
-          title: DOCUMENT.title
+          timeZoneOffset: TZO,
+          sessionId: SID,
+          title: DOC.title
         };
-        DOCUMENT.referrer && (data.referrer = parseUrl(DOCUMENT.referrer));
+        DOC.referrer && (data.referrer = parseUrl(DOC.referrer));
 
         // Not supported by IE yet.
         try {
@@ -238,7 +238,7 @@
         }
       ) || cb,
 
-      encrypt = function() {
+      ec = function() { // Encryption function
 
         // Global variables
         // ################
@@ -477,7 +477,7 @@
           return p;
         },
         
-        // Algorithm 7 (case A = 0): https://eprint.iacr.org/2015/1060.pdf
+        // Algorithm 7 (case a = 0): https://eprint.iacr.org/2015/1060.pdf
         // Keep in mind: we’re working in a finite field over some big prime P.
         // This basically means all operations — additions, multiplications,
         // subtractions — would be done modulo P
@@ -524,7 +524,7 @@
         },
         
         // Point doubling:
-        // Algorithm 9 (case A = 0): https://eprint.iacr.org/2015/1060.pdf
+        // Algorithm 9 (case a = 0): https://eprint.iacr.org/2015/1060.pdf
         double = ([x = 0n, y = 0n, z = 1n] = []) => {
           let t0 = mod(y * y),   // step 1
           t1 = mod(y * z),   // step 5
@@ -551,9 +551,9 @@
         
         // Used to speed up multiplication with a point on the curve, like G.
         W = 2 ** 3,
-        NUM_WINDOWS = 256 / W + 1,
+        NUM_WINS = 256 / W + 1,
         MAX_NUMBER = 2 ** W,
-        WINDOW_SIZE = MAX_NUMBER >> 1,
+        WIN_SIZE = MAX_NUMBER >> 1,
         MASK = BigInt(MAX_NUMBER - 1),
         SHIFT_BY = BigInt(W),
         precomputesG = [],
@@ -562,10 +562,10 @@
         precomputeWindows = (base = G, points = precomputesG) => {
           if (points.length) return points;
           let p = base, w = 0, i;
-          for (; w < NUM_WINDOWS; ++w) {
+          for (; w < NUM_WINS; ++w) {
             base = p;
             points.push(base);
-            for (i = 1; i < WINDOW_SIZE; ++i) points.push(base = add(base, p));
+            for (i = 1; i < WIN_SIZE; ++i) points.push(base = add(base, p));
             p = double(base);
           }
           return points;
@@ -575,7 +575,7 @@
           return (n, precomputes) => {
             let p = I, f = I, w = 0, o = 0, o2, wbits, cached, ncached;
         
-            for (; w < NUM_WINDOWS; ++w, o += WINDOW_SIZE) {
+            for (; w < NUM_WINS; ++w, o += WIN_SIZE) {
               // Extract W bits.
               wbits = Number(n & MASK);
         
@@ -584,7 +584,7 @@
         
               // If the bits are bigger than max size, we’ll split those.
               // +224 => 256 - 32
-              if (wbits > WINDOW_SIZE) {
+              if (wbits > WIN_SIZE) {
                 wbits -= MAX_NUMBER;
                 n += 1n;
               }
@@ -684,25 +684,25 @@
       }(), // END of encrypt code
 
       // Function to send data to servers.
-      send = CB && typeof WINDOW[CB] === 'function' && ((...data) => WINDOW[CB].apply(WINDOW, data))
-        || (ACCOUNT_ID && (async (
+      send = CB && typeof WIN[CB] === 'function' && ((...data) => WIN[CB].apply(WIN, data))
+        || (A && (async (
           data, // data to send
           encryptionKey, // if true or a key, will encrypt using ECC Secp256k1 Encryption (aka Bitcoin encryption)
           uri = 'https://api.angelytics.ai/api/event', // where to send it
-          _ek = encryptionKey && typeof encryptionKey !== 'string' && ENCRYPTION_KEY || encryptionKey
+          _ek = encryptionKey && typeof encryptionKey !== 'string' && EK || encryptionKey
         ) => {
           // @Tristan: remove the console.log for production
           // console.log('sending data to server...', data);
 
           // Encrypt the data if needed.
           data = {
-            accountId: ACCOUNT_ID,
+            accountId: A,
             ...data,
           };
           if (_ek) {
             try {
-              data.userId && (data.userId = encrypt(data.userId, _ek));
-              data.body && (data.body = encrypt(data.body, _ek));
+              data.userId && (data.userId = ec(data.userId, _ek));
+              data.body && (data.body = ec(data.body, _ek));
               data.flag = 1;
             } catch (error) {
               // Could not encrypt the message.
@@ -744,8 +744,8 @@
               return Promise.reject(error);
             });
         })),
-      SESSION_NAME = `${PREFIX}-session-id`,
-      SESSION_ID = STORAGE && function (id = STORAGE.getItem(SESSION_NAME) || '') {
+      SN = `${PREFIX}-session-id`,
+      SID = STO && function (id = STO.getItem(SN) || '') {
         if (id) return id;
         let t = performance && performance.now() || Date.now(),
           f = (y, x = y & 63) => String.fromCharCode(x < 10 && (x + 48) || (x < 36 && (x + 55)) || (x < 62 && (x + 61)) || 95),
@@ -760,11 +760,11 @@
           id += f(v = v >> 6);
         }
 
-        STORAGE.setItem(SESSION_NAME, id += f(25 + TIMEZONE_OFFSET));
+        STO.setItem(SN, id += f(25 + TZO));
         return id;
       }();
 
-    WINDOW[NAMESPACE] = {
+    WIN[NAMESPACE] = {
       // To get metadata.
       getMetadata,
       // Throttle helper function
@@ -782,7 +782,7 @@
         error,
         type,
         userId,
-        encrypt, useEncryption = encrypt, encryptionKey = useEncryption,
+        ect, // Encryption
         url, uri = url,
         extra, detail = extra, details = detail
       } = {}) => {
@@ -796,7 +796,7 @@
         (typeof userId === 'number' || userId) && (data.userId = typeof userId === 'object' && JSON.stringify(userId) || `${userId}`)
 
         // Send data.
-        send(data, encryptionKey, uri);
+        send(data, ect, uri);
         return data;
       },
 
@@ -821,7 +821,7 @@
           }
         )
       ) || (
-        force && (node === DOCUMENT.body && DOCUMENT || node).addEventListener(prop.slice(2), cb)
+        force && (node === DOC.body && DOC || node).addEventListener(prop.slice(2), cb)
       ),
 
       // Overide direct gesture event functions.
@@ -850,17 +850,17 @@
         (
           (
             node.scrollHeight > node.clientHeight
-            || (node === document.body && node.clientHeight > WINDOW.innerHeight)
+            || (node === document.body && node.clientHeight > WIN.innerHeight)
             || canScroll(node, 'scrollTop')
           )
-          && WINDOW.getComputedStyle(node).overflowY.indexOf('hidden') === -1
+          && WIN.getComputedStyle(node).overflowY.indexOf('hidden') === -1
         ) || (
             (
               node.scrollWidth > node.clientWidth
-              || (node === document.body && node.clientWidth > WINDOW.innerWidth)
+              || (node === document.body && node.clientWidth > WIN.innerWidth)
               || canScroll(node, 'scrollLeft')
             )
-            && WINDOW.getComputedStyle(node).overflowX.indexOf('hidden') === -1
+            && WIN.getComputedStyle(node).overflowX.indexOf('hidden') === -1
         )
       ) && attrOveride(node, 'onscroll', ((
         timeoutId = 0,
@@ -873,8 +873,8 @@
         x, y,
         p = (v, r) => Math.min(Math.max(Math.round(100 * v / r), 0), 100),
         f = () => {
-          let w = Math.max((node.scrollWidth - (node === document.body && WINDOW.innerWidth || node.clientWidth))),
-            h = Math.max((node.scrollHeight - (node === document.body && WINDOW.innerHeight || node.clientHeight))),
+          let w = Math.max((node.scrollWidth - (node === document.body && WIN.innerWidth || node.clientWidth))),
+            h = Math.max((node.scrollHeight - (node === document.body && WIN.innerHeight || node.clientHeight))),
             o;
           xmin !== xmax && ((o || (o = {})).horizontalScroll = {range: [p(xmin, w), p(xmax, w)], start: p(xstart, w), end: p(x, w)});
           ymin !== ymax && ((o || (o = {})).verticalScroll = {range: [p(ymin, h), p(ymax, h)], start: p(ystart, h), end: p(y, h)});
@@ -890,8 +890,8 @@
         }
       ) => throttle(() => {
           if (node === document.body) {
-            x = WINDOW.scrollX;
-            y = WINDOW.scrollY;
+            x = WIN.scrollX;
+            y = WIN.scrollY;
           } else {
             x = node.scrollLeft;
             y = node.scrollTop;
@@ -927,12 +927,12 @@
         }
 
         // Page crash.
-        if (STORAGE) {
-          STORAGE.setItem(GOOD_EXIT, 'pending');
-          setInterval(() => STORAGE.setItem(TIME_BEFORE_CRASH, Date.now()), 1000);
+        if (STO) {
+          STO.setItem(GOOD_EXIT, 'pending');
+          setInterval(() => STO.setItem(TIME_BEFORE_CRASH, Date.now()), 1000);
 
           // To check if tab is duplicated.
-          STORAGE.setItem(WINDOW_NAME, getWindowName());
+          STO.setItem(WIN_NAME, getWindowName());
         }
 
         // Record session start.
@@ -943,17 +943,17 @@
         });
 
         // Remove the listener.
-        WINDOW.removeEventListener('load', onload);
+        WIN.removeEventListener('load', onload);
       },
       getWindowName = (defaultName) => {
         try {
-          defaultName = WINDOW.name || `${WINDOW.performance.navigation.type}`;
+          defaultName = WIN.name || `${WIN.performance.navigation.type}`;
         } catch { }
         return defaultName;
       },
       GOOD_EXIT = `${PREFIX}-good-exit`,
       TIME_BEFORE_CRASH = `${PREFIX}-time-before-crash`,
-      WINDOW_NAME = `${PREFIX}-window-name`,
+      WIN_NAME = `${PREFIX}-window-name`,
 
       // Method overloading to capture events.
       addEventListener = EventTarget.prototype.addEventListener;
@@ -977,14 +977,14 @@
       }
 
       // Add load listener.
-      WINDOW.addEventListener('load', onload);
+      WIN.addEventListener('load', onload);
 
       // Add beforeunload listener, for page crashes and end session.
-      STORAGE && WINDOW.addEventListener(
+      STO && WIN.addEventListener(
         'beforeunload',
         () => {
           // For page crashes.
-          STORAGE.setItem(GOOD_EXIT, 'true');
+          STO.setItem(GOOD_EXIT, 'true');
 
           // Record session end.
           record({
@@ -996,7 +996,7 @@
       );
 
       // Record crashes.
-      WINDOW.addEventListener('error', e => {
+      WIN.addEventListener('error', e => {
         record({
           eventName: 'code',
           error: {
@@ -1009,19 +1009,19 @@
         });
       });
 
-      if (STORAGE && STORAGE.getItem(WINDOW_NAME) === getWindowName() && STORAGE.getItem(GOOD_EXIT) !== 'true') {
+      if (STO && STO.getItem(WIN_NAME) === getWindowName() && STO.getItem(GOOD_EXIT) !== 'true') {
         record({
           eventName: 'crash',
           error: {
             message: 'Unresponsive code/page',
-            timeBeforeCrash: STORAGE.getItem(TIME_BEFORE_CRASH)
+            timeBeforeCrash: STO.getItem(TIME_BEFORE_CRASH)
           },
           type: 'error'
         });
       }
 
       // To send a custom event, width additional data.
-      WINDOW[NAMESPACE].sendCustomEvent = (eventName, data, userId, useEncryption) => {
+      WIN[NAMESPACE].sendCustomEvent = (eventName, data, userId, useEncryption) => {
         if (!eventName || typeof eventName !== 'string')
           throw Error('In sendCustomEvent: first argument must be a non-empty event identifier string');
         else return record({
@@ -1029,14 +1029,14 @@
           body: data, 
           type: 'custom',
           userId,
-          encryptionKey: useEncryption
+          ect: useEncryption
         });
       };
 
     } // END OF IF SEND
 
     // Remove script node from dom.
-    script.remove();
+    sc.remove();
 
   } // END OF CODE.
 })();
