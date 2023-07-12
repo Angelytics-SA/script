@@ -691,7 +691,7 @@
           encryptionKey = ENCRYPTION_KEY // if true, will encrypt using ECC Secp256k1 Encryption (aka Bitcoin encryption)
         ) => {
           // @Tristan: remove the console.log for production
-          // console.log('sending data to server...', data);
+          console.log('sending data to server...', data);
 
           // Encrypt the data if needed.
           try {
@@ -778,6 +778,7 @@
           node,
           prop,
           cb,
+          force = false,
           func = (node.getAttribute && node.getAttribute(prop)) || node[prop],
           t = typeof func
         ) => t === 'function' && (
@@ -786,13 +787,15 @@
             return func.apply(node, args);
           }
         ) || (
-            t === 'string' && (
-              node[prop] = () => {
-                cb();
-                eval(func);
-              }
-            )
-          ),
+          t === 'string' && (
+            node[prop] = () => {
+              cb();
+              eval(func);
+            }
+          )
+        ) || (
+          force && (node === DOCUMENT.body && DOCUMENT || node).addEventListener(prop.slice(2), cb)
+        ),
 
         // Overide direct gesture event functions.
         clickAttrOveride = (node, prop) => attrOveride(
@@ -802,26 +805,82 @@
         ),
 
         // Overide scrolling event.
-        scrollAttrOveride = node => ((
-          node.scrollHeight > node.clientHeight
-          && WINDOW.getComputedStyle(node).overflowY.indexOf('hidden') !== -1
-        ) || (
-            node.scrollWidth > node.clientWidth
-            && WINDOW.getComputedStyle(node).overflowX.indexOf('hidden') !== -1
-          )) && attrOveride(node, 'onscroll', throttle(() => {
-            record('scroll', {
-              scrollPercentageX: Math.round(100 * node.scrollLeft / Math.max((node.scrollWidth - node.clientWidth), 1)),
-              scrollPercentageY: Math.round(100 * node.scrollTop / Math.max((node.scrollHeight - node.clientHeight), 1)),
-            }, node, null, 'gesture')
-          }, 2000)),
+        canScroll = (node, scrollAxis) => {
+          if (node[scrollAxis] === 0) {
+            node[scrollAxis] = 1;
+            if (node[scrollAxis] === 1) {
+              node[scrollAxis] = 0;
+              return true;
+            }
+          } else return true;
+          return false;
+        },
+        scrollAttrOveride = node => (
+          (
+            (
+              node.scrollHeight > node.clientHeight
+              || (node === document.body && node.clientHeight > WINDOW.innerHeight)
+              || canScroll(node, 'scrollTop')
+            )
+            && WINDOW.getComputedStyle(node).overflowY.indexOf('hidden') === -1
+          ) || (
+              (
+                node.scrollWidth > node.clientWidth
+                || (node === document.body && node.clientWidth > WINDOW.innerWidth)
+                || canScroll(node, 'scrollLeft')
+              )
+              && WINDOW.getComputedStyle(node).overflowX.indexOf('hidden') === -1
+          )
+        ) && attrOveride(node, 'onscroll', ((
+          timeoutId = 0,
+          xmin = Infinity,
+          ymin = Infinity,
+          xmax = 0,
+          ymax = 0,
+          xstart,
+          ystart,
+          x, y,
+          p = (v, r) => Math.min(Math.max(Math.round(100 * v / r), 0), 100),
+          f = () => {
+            let w = Math.max((node.scrollWidth - (node === document.body && WINDOW.innerWidth || node.clientWidth))),
+              h = Math.max((node.scrollHeight - (node === document.body && WINDOW.innerHeight || node.clientHeight))),
+              o;
+            xmin !== xmax && ((o || (o = {})).scrollPercentageX = {range: [p(xmin, w), p(xmax, w)], start: p(xstart, w), end: p(x, w)});
+            ymin !== ymax && ((o || (o = {})).scrollPercentageY = {range: [p(ymin, h), p(ymax, h)], start: p(ystart, h), end: p(y, h)});
+            o && record('scroll', o, node, null, 'gesture');
+            xmin = ymin = Infinity;
+            xmax = ymax = 0;
+            xstart = ystart = undefined;
+          }
+        ) => throttle(() => {
+            if (node === document.body) {
+              x = WINDOW.scrollX;
+              y = WINDOW.scrollY;
+            } else {
+              x = node.scrollLeft;
+              y = node.scrollTop;
+            }
+            if (xstart === undefined) {
+              xstart = x;
+              ystart = y;
+            }
+            xmin = Math.min(x, xmin);
+            ymin = Math.min(y, ymin);
+            xmax = Math.max(x, xmax);
+            ymax = Math.max(y, ymax);
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(f, 500); // f only triggered if not scrolled after 500ms
+          }, 50)
+        )(), true),
         onload = () => {
-          let node = document.body, queue = [node];
+          let node = document.body, queue = [node], tn;
           while (node = queue.pop()) {
             // Add children node to the queue.
             for (let i = 0, cn = node.childNodes || [], l = cn.length; i !== l; ++i) queue.push(cn[i]);
 
             // Check if node is attached an onclick attribute.
-            if (node.tagName !== 'script') {
+            tn = (node.tagName || '').toLowerCase();
+            if (tn && tn !== 'script' && tn !== 'br') {
               clickAttrOveride(node, 'onclick');
               clickAttrOveride(node, 'onmouseup');
               clickAttrOveride(node, 'onmousedown');
