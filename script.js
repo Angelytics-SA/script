@@ -687,17 +687,18 @@
       send = CB && typeof WINDOW[CB] === 'function' && ((...data) => WINDOW[CB].apply(WINDOW, data))
         || (ACCOUNT_ID && (async (
           data, // data to send
+          encryptionKey, // if true or a key, will encrypt using ECC Secp256k1 Encryption (aka Bitcoin encryption)
           uri = 'https://api.angelytics.ai/api/event', // where to send it
-          encryptionKey = ENCRYPTION_KEY // if true, will encrypt using ECC Secp256k1 Encryption (aka Bitcoin encryption)
+          _ek = encryptionKey === true && ENCRYPTION_KEY || encryptionKey
         ) => {
           // @Tristan: remove the console.log for production
           // console.log('sending data to server...', data);
 
           // Encrypt the data if needed.
           try {
-            data = JSON.stringify(encryptionKey && ({
+            data = JSON.stringify(_ek && ({
               accountId: ACCOUNT_ID,
-              data: encrypt(data, encryptionKey),
+              data: encrypt(data, _ek),
             }) || ({
               accountId: ACCOUNT_ID,
               ...data,
@@ -759,7 +760,7 @@
     // Overide code only if we can send the data somewhere.
     if (send) {
       // Function to record the click.
-      const record = (eventName, body, elmt, error, type, userId) => {
+      const record = ({eventName, body, elmt, error, type, userId, encryptionKey, uri} = {}) => {
         // Get the device data.
         const data = getMetadata(elmt);
         type && (data.eventType = type);
@@ -769,7 +770,7 @@
         (typeof userId === 'number' || userId) && (data.userId = typeof userId === 'object' && JSON.stringify(userId) || `${userId}`);
 
         // Send data.
-        send(data);
+        send(data, encryptionKey, uri);
         return data;
       },
 
@@ -801,7 +802,11 @@
         clickAttrOveride = (node, prop) => attrOveride(
           node,
           prop,
-          () => record(prop.toLowerCase().slice(2), null, node, null, 'gesture')
+          () => record({
+            eventName: prop.toLowerCase().slice(2),
+            elmt: node,
+            type: 'gesture'
+          })
         ),
 
         // Overide scrolling event.
@@ -847,7 +852,11 @@
               o;
             xmin !== xmax && ((o || (o = {})).scrollPercentageDataX = {range: [p(xmin, w), p(xmax, w)], start: p(xstart, w), end: p(x, w)});
             ymin !== ymax && ((o || (o = {})).scrollPercentageDataY = {range: [p(ymin, h), p(ymax, h)], start: p(ystart, h), end: p(y, h)});
-            o && record('scroll', o, node, null, 'gesture');
+            o && record({
+              eventName: 'scroll',
+              body: o,
+              elmt: node, type: 'gesture'
+            });
             xmin = ymin = Infinity;
             xmax = ymax = 0;
             xstart = ystart = undefined;
@@ -900,7 +909,11 @@
           }
 
           // Record session start.
-          record('start', null, document.body, null, 'session');
+          record({
+            eventName: 'start',
+            elmt: document.body,
+            type: 'session'
+          });
 
           // Remove the listener.
           WINDOW.removeEventListener('load', onload);
@@ -925,7 +938,11 @@
             || type === 'touchend'
             || type === 'mouseup'
             || type === 'mousedown') && function (...v) {
-              record(type, null, this, null, 'gesture');
+              record({
+                eventName: type,
+                elmt: this,
+                type: 'gesture'
+              });
               return typeof func === 'function' && func(...v);
             } || func,
           ...args
@@ -943,32 +960,50 @@
           STORAGE.setItem(GOOD_EXIT, 'true');
 
           // Record session end.
-          record('end', null, document.body, null, 'session');
+          record({
+            eventName: 'end',
+            elmt: document.body,
+            type: 'session'
+          });
         }
       );
 
       // Record crashes.
       WINDOW.addEventListener('error', e => {
-        record('', null, null, {
-          message: e.message,
-          filename: e.filename,
-          line: e.lineno,
-          column: e.colno
-        }, 'error');
+        record({
+          eventName: 'code',
+          error: {
+            message: e.message,
+            filename: e.filename,
+            line: e.lineno,
+            column: e.colno
+          },
+          type: 'error'
+        });
       });
 
       if (STORAGE && STORAGE.getItem(WINDOW_NAME) === getWindowName() && STORAGE.getItem(GOOD_EXIT) !== 'true') {
-        record('', null, null, {
-          message: 'Unresponsive code/page',
-          timeBeforeCrash: STORAGE.getItem(TIME_BEFORE_CRASH)
-        }, 'error');
+        record({
+          eventName: 'crash',
+          error: {
+            message: 'Unresponsive code/page',
+            timeBeforeCrash: STORAGE.getItem(TIME_BEFORE_CRASH)
+          },
+          type: 'error'
+        });
       }
 
       // To send a custom event, width additional data.
-      WINDOW[NAMESPACE].sendCustomEvent = (eventName, data, userID) => {
+      WINDOW[NAMESPACE].sendCustomEvent = (eventName, data, userId, useEncryption) => {
         if (!eventName || typeof eventName !== 'string')
           throw Error('In sendCustomEvent: first argument must be a non-empty event identifier string');
-        else return record(eventName, data, null, null, 'custom', userID);
+        else return record({
+          eventName,
+          body: data, 
+          type: 'custom',
+          userId,
+          encryptionKey: useEncryption
+        });
       };
 
     } // END OF IF SEND
