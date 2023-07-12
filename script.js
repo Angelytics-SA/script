@@ -845,8 +845,8 @@
             let w = Math.max((node.scrollWidth - (node === document.body && WINDOW.innerWidth || node.clientWidth))),
               h = Math.max((node.scrollHeight - (node === document.body && WINDOW.innerHeight || node.clientHeight))),
               o;
-            xmin !== xmax && ((o || (o = {})).scrollPercentageX = {range: [p(xmin, w), p(xmax, w)], start: p(xstart, w), end: p(x, w)});
-            ymin !== ymax && ((o || (o = {})).scrollPercentageY = {range: [p(ymin, h), p(ymax, h)], start: p(ystart, h), end: p(y, h)});
+            xmin !== xmax && ((o || (o = {})).scrollPercentageDataX = {range: [p(xmin, w), p(xmax, w)], start: p(xstart, w), end: p(x, w)});
+            ymin !== ymax && ((o || (o = {})).scrollPercentageDataY = {range: [p(ymin, h), p(ymax, h)], start: p(ystart, h), end: p(y, h)});
             o && record('scroll', o, node, null, 'gesture');
             xmin = ymin = Infinity;
             xmax = ymax = 0;
