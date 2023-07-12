@@ -689,23 +689,36 @@
           data, // data to send
           encryptionKey, // if true or a key, will encrypt using ECC Secp256k1 Encryption (aka Bitcoin encryption)
           uri = 'https://api.angelytics.ai/api/event', // where to send it
-          _ek = encryptionKey === true && ENCRYPTION_KEY || encryptionKey
+          _ek = encryptionKey && typeof encryptionKey !== 'string' && ENCRYPTION_KEY || encryptionKey
         ) => {
           // @Tristan: remove the console.log for production
-          // console.log('sending data to server...', data);
+          console.log('sending data to server...', data);
 
           // Encrypt the data if needed.
+          data = {
+            accountId: ACCOUNT_ID,
+            ...data,
+          };
+          if (_ek) {
+            try {
+              data.userId && (data.userId = encrypt(data.userId, _ek));
+              data.body && (data.body = encrypt(data.body, _ek));
+              data.flag = 1;
+            } catch (error) {
+              // Could not encrypt the message.
+              // It can happen with a probability of 1 / (2^256)
+              return Promise.reject(error);
+            }
+          }
+
+          // Try to stringify the content.
+          // Could fail if data contains cycles.
           try {
-            data = JSON.stringify(_ek && ({
-              accountId: ACCOUNT_ID,
-              data: encrypt(data, _ek),
-            }) || ({
-              accountId: ACCOUNT_ID,
-              ...data,
-            }));
+            data = JSON.stringify(data);
           } catch (error) {
-            // Could not encrypt the message.
-            // It can happen with a probability of 1 / (2^256)
+            // Handle the error
+            // @Tristan: is it the best way to handle the error?
+            console.error(error);
             return Promise.reject(error);
           }
 
@@ -728,6 +741,7 @@
               // Handle the error
               // @Tristan: is it the best way to handle the error?
               console.error(error);
+              return Promise.reject(error);
             });
         })),
       SESSION_NAME = `${PREFIX}-session-id`,
@@ -760,176 +774,189 @@
     // Overide code only if we can send the data somewhere.
     if (send) {
       // Function to record the click.
-      const record = ({eventName, body, elmt, error, type, userId, encryptionKey, uri} = {}) => {
+      const record = ({
+        eventName,
+        data: _data,
+        body = _data,
+        elmt,
+        error,
+        type,
+        userId,
+        encrypt, useEncryption = encrypt, encryptionKey = useEncryption,
+        url, uri = url,
+        extra, detail = extra, details = detail
+      } = {}) => {
         // Get the device data.
         const data = getMetadata(elmt);
         type && (data.eventType = type);
         error && (data.error = error);
         eventName && (data.eventName = eventName);
+        details && typeof details === 'object' && Object.assign(data.details || (data.details = {}), details);
         body && (data.body = body);
-        (typeof userId === 'number' || userId) && (data.userId = typeof userId === 'object' && JSON.stringify(userId) || `${userId}`);
+        (typeof userId === 'number' || userId) && (data.userId = typeof userId === 'object' && JSON.stringify(userId) || `${userId}`)
 
         // Send data.
         send(data, encryptionKey, uri);
         return data;
       },
 
-        // Overide Helper function.
-        attrOveride = (
-          node,
-          prop,
-          cb,
-          force = false,
-          func = (node.getAttribute && node.getAttribute(prop)) || node[prop],
-          t = typeof func
-        ) => t === 'function' && (
-          node[prop] = function (...args) {
+      // Overide Helper function.
+    attrOveride = (
+        node,
+        prop,
+        cb,
+        force = false,
+        func = (node.getAttribute && node.getAttribute(prop)) || node[prop],
+        t = typeof func
+      ) => t === 'function' && (
+        node[prop] = function (...args) {
+          cb();
+          return func.apply(node, args);
+        }
+      ) || (
+        t === 'string' && (
+          node[prop] = () => {
             cb();
-            return func.apply(node, args);
+            eval(func);
           }
-        ) || (
-          t === 'string' && (
-            node[prop] = () => {
-              cb();
-              eval(func);
-            }
-          )
-        ) || (
-          force && (node === DOCUMENT.body && DOCUMENT || node).addEventListener(prop.slice(2), cb)
-        ),
+        )
+      ) || (
+        force && (node === DOCUMENT.body && DOCUMENT || node).addEventListener(prop.slice(2), cb)
+      ),
 
-        // Overide direct gesture event functions.
-        clickAttrOveride = (node, prop) => attrOveride(
-          node,
-          prop,
-          () => record({
-            eventName: prop.toLowerCase().slice(2),
-            elmt: node,
-            type: 'gesture'
-          })
-        ),
+      // Overide direct gesture event functions.
+      clickAttrOveride = (node, prop) => attrOveride(
+        node,
+        prop,
+        () => record({
+          eventName: prop.toLowerCase().slice(2),
+          elmt: node,
+          type: 'gesture'
+        })
+      ),
 
-        // Overide scrolling event.
-        canScroll = (node, scrollAxis) => {
-          if (node[scrollAxis] === 0) {
-            node[scrollAxis] = 1;
-            if (node[scrollAxis] === 1) {
-              node[scrollAxis] = 0;
-              return true;
-            }
-          } else return true;
-          return false;
-        },
-        scrollAttrOveride = node => (
+      // Overide scrolling event.
+      canScroll = (node, scrollAxis) => {
+        if (node[scrollAxis] === 0) {
+          node[scrollAxis] = 1;
+          if (node[scrollAxis] === 1) {
+            node[scrollAxis] = 0;
+            return true;
+          }
+        } else return true;
+        return false;
+      },
+      scrollAttrOveride = node => (
+        (
           (
-            (
-              node.scrollHeight > node.clientHeight
-              || (node === document.body && node.clientHeight > WINDOW.innerHeight)
-              || canScroll(node, 'scrollTop')
-            )
-            && WINDOW.getComputedStyle(node).overflowY.indexOf('hidden') === -1
-          ) || (
-              (
-                node.scrollWidth > node.clientWidth
-                || (node === document.body && node.clientWidth > WINDOW.innerWidth)
-                || canScroll(node, 'scrollLeft')
-              )
-              && WINDOW.getComputedStyle(node).overflowX.indexOf('hidden') === -1
+            node.scrollHeight > node.clientHeight
+            || (node === document.body && node.clientHeight > WINDOW.innerHeight)
+            || canScroll(node, 'scrollTop')
           )
-        ) && attrOveride(node, 'onscroll', ((
-          timeoutId = 0,
-          xmin = Infinity,
-          ymin = Infinity,
-          xmax = 0,
-          ymax = 0,
-          xstart,
-          ystart,
-          x, y,
-          p = (v, r) => Math.min(Math.max(Math.round(100 * v / r), 0), 100),
-          f = () => {
-            let w = Math.max((node.scrollWidth - (node === document.body && WINDOW.innerWidth || node.clientWidth))),
-              h = Math.max((node.scrollHeight - (node === document.body && WINDOW.innerHeight || node.clientHeight))),
-              o;
-            xmin !== xmax && ((o || (o = {})).scrollPercentageDataX = {range: [p(xmin, w), p(xmax, w)], start: p(xstart, w), end: p(x, w)});
-            ymin !== ymax && ((o || (o = {})).scrollPercentageDataY = {range: [p(ymin, h), p(ymax, h)], start: p(ystart, h), end: p(y, h)});
-            o && record({
-              eventName: 'scroll',
-              body: o,
-              elmt: node, type: 'gesture'
-            });
-            xmin = ymin = Infinity;
-            xmax = ymax = 0;
-            xstart = ystart = undefined;
-          }
-        ) => throttle(() => {
-            if (node === document.body) {
-              x = WINDOW.scrollX;
-              y = WINDOW.scrollY;
-            } else {
-              x = node.scrollLeft;
-              y = node.scrollTop;
-            }
-            if (xstart === undefined) {
-              xstart = x;
-              ystart = y;
-            }
-            xmin = Math.min(x, xmin);
-            ymin = Math.min(y, ymin);
-            xmax = Math.max(x, xmax);
-            ymax = Math.max(y, ymax);
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(f, 500); // f only triggered if not scrolled after 500ms
-          }, 50)
-        )(), true),
-        onload = () => {
-          let node = document.body, queue = [node], tn;
-          while (node = queue.pop()) {
-            // Add children node to the queue.
-            for (let i = 0, cn = node.childNodes || [], l = cn.length; i !== l; ++i) queue.push(cn[i]);
-
-            // Check if node is attached an onclick attribute.
-            tn = (node.tagName || '').toLowerCase();
-            if (tn && tn !== 'script' && tn !== 'br') {
-              clickAttrOveride(node, 'onclick');
-              clickAttrOveride(node, 'onmouseup');
-              clickAttrOveride(node, 'onmousedown');
-              clickAttrOveride(node, 'ontouchstart');
-              clickAttrOveride(node, 'ontouchend');
-              scrollAttrOveride(node);
-            }
-          }
-
-          // Page crash.
-          if (STORAGE) {
-            STORAGE.setItem(GOOD_EXIT, 'pending');
-            setInterval(() => STORAGE.setItem(TIME_BEFORE_CRASH, Date.now()), 1000);
-
-            // To check if tab is duplicated.
-            STORAGE.setItem(WINDOW_NAME, getWindowName());
-          }
-
-          // Record session start.
-          record({
-            eventName: 'start',
-            elmt: document.body,
-            type: 'session'
+          && WINDOW.getComputedStyle(node).overflowY.indexOf('hidden') === -1
+        ) || (
+            (
+              node.scrollWidth > node.clientWidth
+              || (node === document.body && node.clientWidth > WINDOW.innerWidth)
+              || canScroll(node, 'scrollLeft')
+            )
+            && WINDOW.getComputedStyle(node).overflowX.indexOf('hidden') === -1
+        )
+      ) && attrOveride(node, 'onscroll', ((
+        timeoutId = 0,
+        xmin = Infinity,
+        ymin = Infinity,
+        xmax = 0,
+        ymax = 0,
+        xstart,
+        ystart,
+        x, y,
+        p = (v, r) => Math.min(Math.max(Math.round(100 * v / r), 0), 100),
+        f = () => {
+          let w = Math.max((node.scrollWidth - (node === document.body && WINDOW.innerWidth || node.clientWidth))),
+            h = Math.max((node.scrollHeight - (node === document.body && WINDOW.innerHeight || node.clientHeight))),
+            o;
+          xmin !== xmax && ((o || (o = {})).horizontalScroll = {range: [p(xmin, w), p(xmax, w)], start: p(xstart, w), end: p(x, w)});
+          ymin !== ymax && ((o || (o = {})).verticalScroll = {range: [p(ymin, h), p(ymax, h)], start: p(ystart, h), end: p(y, h)});
+          o && record({
+            eventName: 'scroll',
+            elmt: node,
+            type: 'gesture',
+            extra: o
           });
+          xmin = ymin = Infinity;
+          xmax = ymax = 0;
+          xstart = ystart = undefined;
+        }
+      ) => throttle(() => {
+          if (node === document.body) {
+            x = WINDOW.scrollX;
+            y = WINDOW.scrollY;
+          } else {
+            x = node.scrollLeft;
+            y = node.scrollTop;
+          }
+          if (xstart === undefined) {
+            xstart = x;
+            ystart = y;
+          }
+          xmin = Math.min(x, xmin);
+          ymin = Math.min(y, ymin);
+          xmax = Math.max(x, xmax);
+          ymax = Math.max(y, ymax);
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(f, 500); // f only triggered if not scrolled after 500ms
+        }, 50)
+      )(), true),
+      onload = () => {
+        let node = document.body, queue = [node], tn;
+        while (node = queue.pop()) {
+          // Add children node to the queue.
+          for (let i = 0, cn = node.childNodes || [], l = cn.length; i !== l; ++i) queue.push(cn[i]);
 
-          // Remove the listener.
-          WINDOW.removeEventListener('load', onload);
-        },
-        getWindowName = (defaultName) => {
-          try {
-            defaultName = WINDOW.name || `${WINDOW.performance.navigation.type}`;
-          } catch { }
-          return defaultName;
-        },
-        GOOD_EXIT = `${PREFIX}-good-exit`,
-        TIME_BEFORE_CRASH = `${PREFIX}-time-before-crash`,
-        WINDOW_NAME = `${PREFIX}-window-name`,
+          // Check if node is attached an onclick attribute.
+          tn = (node.tagName || '').toLowerCase();
+          if (tn && tn !== 'script' && tn !== 'br') {
+            clickAttrOveride(node, 'onclick');
+            clickAttrOveride(node, 'onmouseup');
+            clickAttrOveride(node, 'onmousedown');
+            clickAttrOveride(node, 'ontouchstart');
+            clickAttrOveride(node, 'ontouchend');
+            scrollAttrOveride(node);
+          }
+        }
 
-        // Method overloading to capture events.
-        addEventListener = EventTarget.prototype.addEventListener;
+        // Page crash.
+        if (STORAGE) {
+          STORAGE.setItem(GOOD_EXIT, 'pending');
+          setInterval(() => STORAGE.setItem(TIME_BEFORE_CRASH, Date.now()), 1000);
+
+          // To check if tab is duplicated.
+          STORAGE.setItem(WINDOW_NAME, getWindowName());
+        }
+
+        // Record session start.
+        record({
+          eventName: 'start',
+          elmt: document.body,
+          type: 'session'
+        });
+
+        // Remove the listener.
+        WINDOW.removeEventListener('load', onload);
+      },
+      getWindowName = (defaultName) => {
+        try {
+          defaultName = WINDOW.name || `${WINDOW.performance.navigation.type}`;
+        } catch { }
+        return defaultName;
+      },
+      GOOD_EXIT = `${PREFIX}-good-exit`,
+      TIME_BEFORE_CRASH = `${PREFIX}-time-before-crash`,
+      WINDOW_NAME = `${PREFIX}-window-name`,
+
+      // Method overloading to capture events.
+      addEventListener = EventTarget.prototype.addEventListener;
       EventTarget.prototype.addEventListener = function (type, func, ...args) {
         return addEventListener.apply(this, [
           type,
