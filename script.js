@@ -67,7 +67,7 @@
         || sc.getAttribute('account-id')
         || sc.getAttribute('data-account-id')
       ),
-      NAMESPACE = sc.getAttribute('namespace') || 'angelitics',
+      NAMESPACE = sc.getAttribute('namespace') || 'angelytics',
       CB = sc.getAttribute('callback')
         || sc.getAttribute('cb')
         || sc.getAttribute('data-callback')
