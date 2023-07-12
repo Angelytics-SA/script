@@ -691,7 +691,7 @@
           encryptionKey = ENCRYPTION_KEY // if true, will encrypt using ECC Secp256k1 Encryption (aka Bitcoin encryption)
         ) => {
           // @Tristan: remove the console.log for production
-          console.log('sending data to server...', data);
+          // console.log('sending data to server...', data);
 
           // Encrypt the data if needed.
           try {
