@@ -33,4 +33,42 @@ for (let i = 0, l = ELEMENTS.length, o, k, n, j, m; i !== l; ++i) {
   Object.seal(o);
 }
 
+// Get current fetch and XMLHttpRequest.prototype.open methods
+let oldFetch = window.fetch, oldOpen = XMLHttpRequest.prototype.open;
+try {
+  oldFetch || (oldFetch = fetch);
+} catch {
+  oldFetch = () => {};
+}
+
+// Override fetch
+Object.defineProperty(window, 'fetch', {
+  value: async function (url, ...other) {
+    url = new URL(url);
+    if (/* @Tristan: add condition to detect a Google server call */) {
+      url = new URL(/* @Tristan: get the new Angelytics url */);
+    } else if (/* @Tristan: add condition to detect a Pixel server call */) {
+      url = new URL(/* @Tristan: get the new Angelytics url */);
+    }
+    return await fetch(url.toString(), ...other);
+  },
+  configuarble: false,
+  writable: false
+});
+
+// Override XMLHttpRequest.prototype.open
+Object.defineProperty(XMLHttpRequest.prototype, 'open', {
+  value: function (method, url, ...other) {
+    url = new URL(url);
+    if (/* @Tristan: add condition to detect a Google server call */) {
+      url = new URL(/* @Tristan: get the new Angelytics url */);
+    } else if (/* @Tristan: add condition to detect a Pixel server call */) {
+      url = new URL(/* @Tristan: get the new Angelytics url */);
+    }
+    return oldOpen.apply(this, [method, url.toString(), ...other]);
+  },
+  configuarble: false,
+  writable: false
+});
+
 })(); // End of code
