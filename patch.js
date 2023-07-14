@@ -45,9 +45,9 @@ try {
 Object.defineProperty(window, 'fetch', {
   value: async function (url, ...other) {
     url = new URL(url);
-    if (/* @Tristan: add condition to detect a Google server call */) {
+    if (/* @Tristan: add condition to detect a Google server call from url object*/) {
       url = new URL(/* @Tristan: get the new Angelytics url */);
-    } else if (/* @Tristan: add condition to detect a Pixel server call */) {
+    } else if (/* @Tristan: add condition to detect a Pixel server call from url object */) {
       url = new URL(/* @Tristan: get the new Angelytics url */);
     }
     return await oldFetch(url.toString(), ...other);
@@ -60,9 +60,9 @@ Object.defineProperty(window, 'fetch', {
 Object.defineProperty(XMLHttpRequest.prototype, 'open', {
   value: function (method, url, ...other) {
     url = new URL(url);
-    if (/* @Tristan: add condition to detect a Google server call */) {
+    if (/* @Tristan: add condition to detect a Google server call from url object */) {
       url = new URL(/* @Tristan: get the new Angelytics url */);
-    } else if (/* @Tristan: add condition to detect a Pixel server call */) {
+    } else if (/* @Tristan: add condition to detect a Pixel server call from url object */) {
       url = new URL(/* @Tristan: get the new Angelytics url */);
     }
     return oldOpen.apply(this, [method, url.toString(), ...other]);
