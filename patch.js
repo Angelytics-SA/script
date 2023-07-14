@@ -1,4 +1,4 @@
-(() => { // Start of code
+(() => { // Start of code | to be inserted before other analytics but after the angelitics script
 
 // List of elements to check.
 const ELEMENTS = [
@@ -6,7 +6,7 @@ const ELEMENTS = [
   HTMLInputElement,
   HTMLTextAreaElement,
   HTMLIFrameElement
-], WIN = window, DOC = document,
+],
 
 // Function to return a descriptor that prevents property / attribute / method override.
 getRestrictedOverrideDescriptor = (d, o = { configurable: false }, ) => {
