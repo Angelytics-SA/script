@@ -2291,7 +2291,7 @@ fbq.__openBridgeRollout = 1.0;
                 j.exports;
                 (function () {
                     "use strict";
-                    var a = { ENDPOINT: "https://api.angelytics.com/api/fb-event/", INSTAGRAM_TRIGGER_ATTRIBUTION: "https://www.instagram.com/tr/", AEM_ENDPOINT: "https://www.facebook.com/.well-known/aggregated-event-measurement/" };
+                    var a = { ENDPOINT: "https://api.angelytics.com/api/fb-event", INSTAGRAM_TRIGGER_ATTRIBUTION: "https://www.instagram.com/tr/", AEM_ENDPOINT: "https://www.facebook.com/.well-known/aggregated-event-measurement/" };
                     j.exports = a;
                 })();
                 return j.exports;
