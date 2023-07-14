@@ -50,7 +50,7 @@ Object.defineProperty(window, 'fetch', {
     } else if (/* @Tristan: add condition to detect a Pixel server call */) {
       url = new URL(/* @Tristan: get the new Angelytics url */);
     }
-    return await fetch(url.toString(), ...other);
+    return await oldFetch(url.toString(), ...other);
   },
   configuarble: false,
   writable: false
