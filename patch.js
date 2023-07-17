@@ -8,6 +8,30 @@ const ELEMENTS = [
   HTMLIFrameElement
 ],
 
+DOC = document,
+
+// Get current script parameters.
+scs = DOC.getElementsByTagName && DOC.getElementsByTagName('script'),
+sc = scs[scs.length - 1],
+
+// Angelytics account id.
+// Should be passed in the angelitics server call url.
+A = sc && (
+  sc.getAttribute('userkey')
+  || sc.getAttribute('user-key')
+  || sc.getAttribute('data-user-key')
+  || sc.getAttribute('userid')
+  || sc.getAttribute('user-id')
+  || sc.getAttribute('data-user-id')
+  || sc.getAttribute('user')
+  || sc.getAttribute('data-user')
+  || sc.getAttribute('account')
+  || sc.getAttribute('data-account')
+  || sc.getAttribute('accountid')
+  || sc.getAttribute('account-id')
+  || sc.getAttribute('data-account-id')
+),
+
 // Function to return a descriptor that prevents property / attribute / method override.
 getRestrictedOverrideDescriptor = (d, o = { configurable: false }, ) => {
   d.enumerable && (o.enumerable = true);
@@ -45,10 +69,10 @@ try {
 Object.defineProperty(window, 'fetch', {
   value: async function (url, ...other) {
     url = new URL(url);
-    if (/* @Tristan: add condition to detect a Google server call from url object*/) {
-      url = new URL(/* @Tristan: get the new Angelytics url */);
+    if (/* @Tristan: add condition to detect a Google Analytics server call from url object*/) {
+      url = new URL(/* @Tristan: get the new Angelytics url, also pass the account id 'A' defined above */);
     } else if (/* @Tristan: add condition to detect a Pixel server call from url object */) {
-      url = new URL(/* @Tristan: get the new Angelytics url */);
+      url = new URL(/* @Tristan: get the new Angelytics url, also pass the account id 'A' defined above  */);
     }
     return await oldFetch(url.toString(), ...other);
   },
@@ -60,15 +84,18 @@ Object.defineProperty(window, 'fetch', {
 Object.defineProperty(XMLHttpRequest.prototype, 'open', {
   value: function (method, url, ...other) {
     url = new URL(url);
-    if (/* @Tristan: add condition to detect a Google server call from url object */) {
-      url = new URL(/* @Tristan: get the new Angelytics url */);
+    if (/* @Tristan: add condition to detect a Google Analytics server call from url object */) {
+      url = new URL(/* @Tristan: get the new Angelytics url, also pass the account id 'A' defined above */);
     } else if (/* @Tristan: add condition to detect a Pixel server call from url object */) {
-      url = new URL(/* @Tristan: get the new Angelytics url */);
+      url = new URL(/* @Tristan: get the new Angelytics url, also pass the account id 'A' defined above */);
     }
     return oldOpen.apply(this, [method, url.toString(), ...other]);
   },
   configuarble: false,
   writable: false
 });
+
+// Remove script node from dom.
+sc.remove();
 
 })(); // End of code
