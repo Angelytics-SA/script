@@ -781,6 +781,7 @@
         elmt,
         error,
         type,
+        tags = [], // dev, sales, design, ...
         userId,
         ect, // Encryption
         url, uri = url,
@@ -794,6 +795,7 @@
         details && typeof details === 'object' && Object.assign(data.details || (data.details = {}), details);
         body && (data.body = body);
         (typeof userId === 'number' || userId) && (data.userId = typeof userId === 'object' && JSON.stringify(userId) || `${userId}`)
+        tags && (Array.isArray(tags) || (tags = [tags])) && tags.length && (data.tags = tags);
 
         // Send data.
         send(data, ect, uri);
