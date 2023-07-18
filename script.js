@@ -20,7 +20,15 @@
 
 (() => {
   // Get browser objects.
-  let WIN, NAV, DOC, MQ, MOB, IS_APPLE, STO, LOC, TZO = Math.round((new Date).getTimezoneOffset() / 60);
+  let WIN, NAV, DOC, MQ, MOB, IS_APPLE,
+    STO, LOC, TZO = Math.round((new Date).getTimezoneOffset() / 60),
+    TAGS = {
+      dev: 'dev.',
+      sales: 'sales',
+      design: 'design',
+      management: 'mgmt',
+      execs: 'execs'
+    };
   try {
     WIN = window;
     NAV = WIN.navigator || navigator;
@@ -833,6 +841,7 @@
         () => record({
           eventName: prop.toLowerCase().slice(2),
           elmt: node,
+          tags: [TAGS.design, TAGS.sales],
           type: 'gesture'
         })
       ),
@@ -884,6 +893,7 @@
             eventName: 'scroll',
             elmt: node,
             type: 'gesture',
+            tags: [TAGS.design],
             extra: o
           });
           xmin = ymin = Infinity;
@@ -941,7 +951,8 @@
         record({
           eventName: 'start',
           elmt: document.body,
-          type: 'session'
+          type: 'session',
+          tags: [TAGS.design, TAGS.sales]
         });
 
         // Remove the listener.
@@ -970,7 +981,8 @@
               record({
                 eventName: type,
                 elmt: this,
-                type: 'gesture'
+                type: 'gesture',
+                tags: [TAGS.design]
               });
               return typeof func === 'function' && func(...v);
             } || func,
@@ -992,7 +1004,8 @@
           record({
             eventName: 'end',
             elmt: document.body,
-            type: 'session'
+            type: 'session',
+            tags: [TAGS.design, TAGS.sales]
           });
         }
       );
@@ -1007,7 +1020,8 @@
             line: e.lineno,
             column: e.colno
           },
-          type: 'error'
+          type: 'error',
+          tags: [TAGS.dev]
         });
       });
 
@@ -1018,12 +1032,13 @@
             message: 'Unresponsive code/page',
             timeBeforeCrash: STO.getItem(TIME_BEFORE_CRASH)
           },
-          type: 'error'
+          type: 'error',
+          tags: [TAGS.dev]
         });
       }
 
       // To send a custom event, width additional data.
-      WIN[NAMESPACE].sendCustomEvent = (eventName, data, userId, useEncryption) => {
+      WIN[NAMESPACE].sendCustomEvent = (eventName, data, userId, tags, useEncryption) => {
         if (!eventName || typeof eventName !== 'string')
           throw Error('In sendCustomEvent: first argument must be a non-empty event identifier string');
         else return record({
@@ -1031,9 +1046,13 @@
           body: data, 
           type: 'custom',
           userId,
+          tags,
           ect: useEncryption
         });
       };
+
+      // Available tags.
+      WIN[NAMESPACE].TAGS = TAGS;
 
     } // END OF IF SEND
 
