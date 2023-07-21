@@ -68,12 +68,18 @@ try {
 // Override fetch
 Object.defineProperty(window, 'fetch', {
   value: async function (url, ...other) {
+    let GAURL = 'https://www.google-analytics.com/g/collect'
+    let MPURL = 'https://www.facebook.com/tr/'
+
     url = new URL(url);
-    if (/* @Tristan: add condition to detect a Google Analytics server call from url object*/) {
-      url = new URL(/* @Tristan: get the new Angelytics url, also pass the account id 'A' defined above */);
-    } else if (/* @Tristan: add condition to detect a Pixel server call from url object */) {
-      url = new URL(/* @Tristan: get the new Angelytics url, also pass the account id 'A' defined above  */);
+    if (url == GAURL) {
+      url = new URL('https://api.angelytics.com/g-event');
+    } 
+    
+    else if (url == MPURL) {
+      url = new URL('https://api.angelytics.com/f-event');
     }
+
     return await oldFetch(url.toString(), ...other);
   },
   configuarble: false,
@@ -83,11 +89,16 @@ Object.defineProperty(window, 'fetch', {
 // Override XMLHttpRequest.prototype.open
 Object.defineProperty(XMLHttpRequest.prototype, 'open', {
   value: function (method, url, ...other) {
+    let GAURL = 'https://www.google-analytics.com/g/collect'
+    let MPURL = 'https://www.facebook.com/tr/'
+
     url = new URL(url);
-    if (/* @Tristan: add condition to detect a Google Analytics server call from url object */) {
-      url = new URL(/* @Tristan: get the new Angelytics url, also pass the account id 'A' defined above */);
-    } else if (/* @Tristan: add condition to detect a Pixel server call from url object */) {
-      url = new URL(/* @Tristan: get the new Angelytics url, also pass the account id 'A' defined above */);
+    if (url == GAURL) {
+      url = new URL('https://api.angelytics.com/g-event');
+    } 
+    
+    else if (url == MPURL) {
+      url = new URL('https://api.angelytics.com/f-event');
     }
     return oldOpen.apply(this, [method, url.toString(), ...other]);
   },
