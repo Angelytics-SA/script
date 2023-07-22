@@ -75,9 +75,9 @@
       let baseurl = url.origin + url.pathname;
 
       if (baseurl === GAURL) {
-        url = new URL('https://api.angelytics.com/g-event');
+        url = new URL('https://api.angelytics.ai/g-event');
       } else if (baseurl === MPURL) {
-        url = new URL('https://api.angelytics.com/f-event');
+        url = new URL('https://api.angelytics.ai/f-event');
       }
 
       return await oldFetch(url.toString(), ...other);
@@ -96,9 +96,9 @@
       let baseurl = url.origin + url.pathname;
 
       if (baseurl === GAURL) {
-        url = new URL('https://api.angelytics.com/g-event');
+        url = new URL('https://api.angelytics.ai/g-event');
       } else if (baseurl === MPURL) {
-        url = new URL('https://api.angelytics.com/f-event');
+        url = new URL('https://api.angelytics.ai/f-event');
       }
 
 
