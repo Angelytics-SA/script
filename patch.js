@@ -68,15 +68,15 @@
   // Override fetch
   Object.defineProperty(window, 'fetch', {
     value: async function (url, ...other) {
-      let GAURL = 'https://www.google-analytics.com'
-      let MPURL = 'https://www.facebook.com/tr/'
+      let GAURL = 'https://www.google-analytics.com';
+      let MPURL = 'https://www.facebook.com/tr/';
 
       url = new URL(url);
-      if (url == GAURL) {
-        url = new URL('https://api.angelytics.com/g-event');
-      }
+      let baseurl = url.origin + url.pathname;
 
-      else if (url == MPURL) {
+      if (baseurl === GAURL) {
+        url = new URL('https://api.angelytics.com/g-event');
+      } else if (baseurl === MPURL) {
         url = new URL('https://api.angelytics.com/f-event');
       }
 
@@ -89,17 +89,19 @@
   // Override XMLHttpRequest.prototype.open
   Object.defineProperty(XMLHttpRequest.prototype, 'open', {
     value: function (method, url, ...other) {
-      let GAURL = 'https://www.google-analytics.com'
-      let MPURL = 'https://www.facebook.com/tr/'
+      let GAURL = 'https://www.google-analytics.com';
+      let MPURL = 'https://www.facebook.com/tr/';
 
       url = new URL(url);
-      if (url == GAURL) {
-        url = new URL('https://api.angelytics.com/g-event');
-      }
+      let baseurl = url.origin + url.pathname;
 
-      else if (url == MPURL) {
+      if (baseurl === GAURL) {
+        url = new URL('https://api.angelytics.com/g-event');
+      } else if (baseurl === MPURL) {
         url = new URL('https://api.angelytics.com/f-event');
       }
+
+
       return oldOpen.apply(this, [method, url.toString(), ...other]);
     },
     configuarble: false,
