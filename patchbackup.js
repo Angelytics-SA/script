@@ -69,17 +69,15 @@
   Object.defineProperty(window, 'fetch', {
     value: async function (url, ...other) {
       let GAURL = 'https://www.google-analytics.com/g/collect'
-      let MPURL = 'https://www.facebook.com/tr/';
+      let MPURL = 'https://www.facebook.com/tr/'
 
       url = new URL(url);
-      let baseurl = url.origin + url.pathname;
+      if (url == GAURL) {
+        url = new URL('https://api.angelytics.com/g-event');
+      }
 
-      console.log("fetch baseurl", baseurl)
-
-      if (baseurl === GAURL) {
-        url = new URL('https://api.angelytics.ai/g-event');
-      } else if (baseurl === MPURL) {
-        url = new URL('https://api.angelytics.ai/fb-event');
+      else if (url == MPURL) {
+        url = new URL('https://api.angelytics.com/f-event');
       }
 
       return await oldFetch(url.toString(), ...other);
@@ -92,20 +90,16 @@
   Object.defineProperty(XMLHttpRequest.prototype, 'open', {
     value: function (method, url, ...other) {
       let GAURL = 'https://www.google-analytics.com/g/collect'
-      let MPURL = 'https://www.facebook.com/tr/';
+      let MPURL = 'https://www.facebook.com/tr/'
 
       url = new URL(url);
-      let baseurl = url.origin + url.pathname;
-
-      console.log("XLMHttpRequest baseurl", baseurl)
-
-      if (baseurl === GAURL) {
-        url = new URL('https://api.angelytics.ai/g-event');
-      } else if (baseurl === MPURL) {
-        url = new URL('https://api.angelytics.ai/fb-event');
+      if (url == GAURL) {
+        url = new URL('https://api.angelytics.com/g-event');
       }
 
-
+      else if (url == MPURL) {
+        url = new URL('https://api.angelytics.com/f-event');
+      }
       return oldOpen.apply(this, [method, url.toString(), ...other]);
     },
     configuarble: false,
