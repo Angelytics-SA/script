@@ -167,6 +167,25 @@
   });
 
 
+  // Override navigator.sendBeacon
+  let oldSendBeacon = navigator.sendBeacon;
+
+  navigator.sendBeacon = function (url, data) {
+    let GAURL = 'https://www.google-analytics.com/g/collect';
+    let MPURL = 'https://www.facebook.com/tr/';
+
+    url = new URL(url, window.location);
+    if (url.origin + url.pathname === GAURL) {
+      url = new URL('https://api.angelytics.ai/g-event' + url.search + url.hash);
+    } else if (url.origin + url.pathname === MPURL) {
+      url = new URL('https://api.angelytics.ai/fb-event' + url.search + url.hash);
+    }
+
+    console.log("Beacon request url", url.href); // Log the URL
+    return oldSendBeacon.call(navigator, url.toString(), data);
+  };
+
+
 
 
   // Remove script node from dom.
