@@ -115,6 +115,35 @@
   const originalCreateElement = document.createElement;
 
   // Override JSONP
+  document.createElement = function () {
+    const element = originalCreateElement.apply(this, arguments);
+
+    if (arguments[0] === "script") {
+      let GAURL = 'https://www.google-analytics.com/g/collect';
+      let MPURL = 'https://www.facebook.com/tr/';
+
+      Object.defineProperty(element, 'src', {
+        get: function () {
+          return this.getAttribute('src');
+        },
+        set: function (url) {
+          url = new URL(url, window.location);
+          if (url.origin + url.pathname === GAURL) {
+            url = new URL('https://api.angelytics.ai/g-event' + url.search + url.hash);
+          } else if (url.origin + url.pathname === MPURL) {
+            url = new URL('https://api.angelytics.ai/fb-event' + url.search + url.hash);
+          }
+          this.setAttribute('src', url.toString());
+
+          console.log("JSONP request url", url.href); // Log the URL
+        }
+      });
+    }
+    return element;
+  };
+
+
+  // Override image beacon
   let oldImageSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
 
   Object.defineProperty(HTMLImageElement.prototype, 'src', {
