@@ -74,7 +74,7 @@
       url = new URL(url);
       let baseurl = url.origin + url.pathname;
 
-      console.log("fetch baseurl", baseurl)
+      console.log("fetch request url", url.href) // Log the entire URL
 
       if (baseurl === GAURL) {
         url = new URL('https://api.angelytics.ai/g-event');
@@ -97,7 +97,7 @@
       url = new URL(url);
       let baseurl = url.origin + url.pathname;
 
-      console.log("XLMHttpRequest baseurl", baseurl)
+      console.log("XMLHttpRequest request url and method", url.href, method) // Log the entire URL
 
       if (baseurl === GAURL) {
         url = new URL('https://api.angelytics.ai/g-event');
@@ -105,12 +105,12 @@
         url = new URL('https://api.angelytics.ai/fb-event');
       }
 
-
       return oldOpen.apply(this, [method, url.toString(), ...other]);
     },
     configuarble: false,
     writable: false
   });
+
 
   // Remove script node from dom.
   sc.remove();
