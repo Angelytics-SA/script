@@ -68,7 +68,7 @@
   // Override fetch
   Object.defineProperty(window, 'fetch', {
     value: async function (url, ...other) {
-      let GAURL = 'https://www.google-analytics.com';
+      let GAURL = 'https://www.google-analytics.com/g/collect'
       let MPURL = 'https://www.facebook.com/tr/';
 
       url = new URL(url);
@@ -89,7 +89,7 @@
   // Override XMLHttpRequest.prototype.open
   Object.defineProperty(XMLHttpRequest.prototype, 'open', {
     value: function (method, url, ...other) {
-      let GAURL = 'https://www.google-analytics.com';
+      let GAURL = 'https://www.google-analytics.com/g/collect'
       let MPURL = 'https://www.facebook.com/tr/';
 
       url = new URL(url);
