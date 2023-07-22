@@ -115,32 +115,28 @@
   const originalCreateElement = document.createElement;
 
   // Override JSONP
-  document.createElement = function () {
-    const element = originalCreateElement.apply(this, arguments);
+  let oldImageSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
 
-    if (arguments[0] === "script") {
-      let GAURL = 'https://www.google-analytics.com/g/collect';
+  Object.defineProperty(HTMLImageElement.prototype, 'src', {
+    enumerable: true,
+    configurable: true,
+    get: oldImageSrcDescriptor.get,
+    set: function (url) {
+      let GAURL = 'https://www.google-analytics.com/collect';
       let MPURL = 'https://www.facebook.com/tr/';
 
-      Object.defineProperty(element, 'src', {
-        get: function () {
-          return this.getAttribute('src');
-        },
-        set: function (url) {
-          url = new URL(url, window.location);
-          if (url.origin + url.pathname === GAURL) {
-            url = new URL('https://api.angelytics.ai/g-event' + url.search + url.hash);
-          } else if (url.origin + url.pathname === MPURL) {
-            url = new URL('https://api.angelytics.ai/fb-event' + url.search + url.hash);
-          }
-          this.setAttribute('src', url.toString());
+      url = new URL(url, window.location);
+      if (url.origin + url.pathname === GAURL) {
+        url = new URL('https://api.angelytics.ai/g-event' + url.search + url.hash);
+      } else if (url.origin + url.pathname === MPURL) {
+        url = new URL('https://api.angelytics.ai/fb-event' + url.search + url.hash);
+      }
 
-          console.log("JSONP request url", url.href); // Log the URL
-        }
-      });
+      console.log("Image beacon request url", url.href); // Log the URL
+      oldImageSrcDescriptor.set.call(this, url.toString());
     }
-    return element;
-  };
+  });
+
 
 
 
