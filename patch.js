@@ -151,7 +151,7 @@
     configurable: true,
     get: oldImageSrcDescriptor.get,
     set: function (url) {
-      let GAURL = 'https://www.google-analytics.com/collect';
+      let GAURL = 'https://www.google-analytics.com/g/collect';
       let MPURL = 'https://www.facebook.com/tr/';
 
       url = new URL(url, window.location);
