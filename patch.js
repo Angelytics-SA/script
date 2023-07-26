@@ -46,147 +46,94 @@
       (typeof (d = Object.getOwnPropertyDescriptor(o || {}, k) || {}).value === 'function' || d.get || d.set)
       && d.configurable
       && Object.defineProperty(o, k, getRestrictedOverrideDescriptor(d))
-    );
+    ),
+
+    // Modify url if needed
+    getUrl = (
+      url,
+      gaUrl = 'https://www.google-analytics.com/g/collect',
+      mpUrl = 'https://www.facebook.com/tr/',
+      _url = new URL(url, window.location),
+      __url = _url.origin + _url.pathname
+    ) => __url === gaUrl && new URL('https://api.angelytics.ai/g-event' + url.search + url.hash)
+      || __url === mpUrl && new URL('https://api.angelytics.ai/fb-event' + url.search + url.hash)
+      || _url,
+
+    // Save the original functions.
+    originalOpen = XMLHttpRequest.prototype.open,
+    originalFetch = function(o) {
+      try {
+        o || (o = fetch);
+      } catch {
+        o = () => { };
+      }
+      return o;
+    }(window.fetch),
+    originalCreateElement = document.createElement,
+    originalImageSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src'),
+    originalSendBeacon = navigator.sendBeacon;
 
   // Prevent override.
-  for (let i = 0, l = ELEMENTS.length, o, k, n, j, m; i !== l; ++i) {
-    o = ELEMENTS[i];
-    for (k in o) protectObjectProperty(o, k);
-    for (j = 0, m = (n = Object.getOwnPropertyNames(o = Object.seal(o).prototype || {})).length; j !== m; ++j)
-      protectObjectProperty(o, n[j]);
-    Object.seal(o);
-  }
+  // for (let i = 0, l = ELEMENTS.length, o, k, n, j, m; i !== l; ++i) {
+  //   o = ELEMENTS[i];
+  //   for (k in o) protectObjectProperty(o, k);
+  //   for (j = 0, m = (n = Object.getOwnPropertyNames(o = Object.seal(o).prototype || {})).length; j !== m; ++j)
+  //     protectObjectProperty(o, n[j]);
+  //   Object.seal(o);
+  // }
 
-  // Get current fetch and XMLHttpRequest.prototype.open methods
-  let oldFetch = window.fetch, oldOpen = XMLHttpRequest.prototype.open;
-  try {
-    oldFetch || (oldFetch = fetch);
-  } catch {
-    oldFetch = () => { };
-  }
+  // Prevent just tge override of Form.submit
+  protectObjectProperty(HTMLFormElement.prototype ,'submit');
 
   // Override fetch
   Object.defineProperty(window, 'fetch', {
     value: async function (url, ...other) {
-      let GAURL = 'https://www.google-analytics.com/g/collect'
-      let MPURL = 'https://www.facebook.com/tr/';
-
-      url = new URL(url);
-      let baseurl = url.origin + url.pathname;
-
-      console.log("fetch request url", url.href) // Log the entire URL
-
-      if (baseurl === GAURL) {
-        url = new URL('https://api.angelytics.ai/g-event');
-      } else if (baseurl === MPURL) {
-        url = new URL('https://api.angelytics.ai/fb-event');
-      }
-
-      return await oldFetch(url.toString(), ...other);
+      return await originalFetch(getUrl(url).toString(), ...other);
     },
-    configuarble: false,
-    writable: false
+    // configuarble: false,
+    // writable: false
   });
 
   // Override XMLHttpRequest.prototype.open
   Object.defineProperty(XMLHttpRequest.prototype, 'open', {
     value: function (method, url, ...other) {
-      let GAURL = 'https://www.google-analytics.com/g/collect'
-      let MPURL = 'https://www.facebook.com/tr/';
-
-      url = new URL(url);
-      let baseurl = url.origin + url.pathname;
-
-      console.log("XMLHttpRequest request url and method", url.href, method) // Log the entire URL
-
-      if (baseurl === GAURL) {
-        url = new URL('https://api.angelytics.ai/g-event');
-      } else if (baseurl === MPURL) {
-        url = new URL('https://api.angelytics.ai/fb-event');
-      }
-
-      return oldOpen.apply(this, [method, url.toString(), ...other]);
+      return originalOpen.apply(this, [method, getUrl(url).toString(), ...other]);
     },
-    configuarble: false,
-    writable: false
+    // configuarble: false,
+    // writable: false
   });
 
-  // Save the original function
-  const originalCreateElement = document.createElement;
-
   // Override JSONP
-  document.createElement = function () {
-    const element = originalCreateElement.apply(this, arguments);
-
-    if (arguments[0] === "script") {
-      let GAURL = 'https://www.google-analytics.com/g/collect';
-      let MPURL = 'https://www.facebook.com/tr/';
-
-      Object.defineProperty(element, 'src', {
-        get: function () {
-          return this.getAttribute('src');
-        },
-        set: function (url) {
-          url = new URL(url, window.location);
-          if (url.origin + url.pathname === GAURL) {
-            url = new URL('https://api.angelytics.ai/g-event' + url.search + url.hash);
-          } else if (url.origin + url.pathname === MPURL) {
-            url = new URL('https://api.angelytics.ai/fb-event' + url.search + url.hash);
-          }
-          this.setAttribute('src', url.toString());
-
-          console.log("JSONP request url", url.href); // Log the URL
-        }
-      });
-    }
+  document.createElement = function (...args) {
+    const element = originalCreateElement.apply(this, args);
+    args[0] === "script" && Object.defineProperty(element, 'src', {
+      get: function () {
+        return this.getAttribute('src');
+      },
+      set: function (url) {
+        this.setAttribute('src', url = getUrl(url).toString());
+        return url;
+      },
+      // configuarble: false,
+    });
+    
     return element;
   };
 
-
   // Override image beacon
-  let oldImageSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
-
   Object.defineProperty(HTMLImageElement.prototype, 'src', {
-    enumerable: true,
-    configurable: true,
-    get: oldImageSrcDescriptor.get,
+    // configuarble: false,
+    get: originalImageSrcDescriptor.get,
     set: function (url) {
-      let GAURL = 'https://www.google-analytics.com/g/collect';
-      let MPURL = 'https://www.facebook.com/tr/';
-
-      url = new URL(url, window.location);
-      if (url.origin + url.pathname === GAURL) {
-        url = new URL('https://api.angelytics.ai/g-event' + url.search + url.hash);
-      } else if (url.origin + url.pathname === MPURL) {
-        url = new URL('https://api.angelytics.ai/fb-event' + url.search + url.hash);
-      }
-
-      console.log("Image beacon request url", url.href); // Log the URL
-      oldImageSrcDescriptor.set.call(this, url.toString());
+      originalImageSrcDescriptor.set.call(this, (url = getUrl(url)).toString());
+      return url;
     }
   });
 
-
   // Override navigator.sendBeacon
-  let oldSendBeacon = navigator.sendBeacon;
-
   navigator.sendBeacon = function (url, data) {
-    let GAURL = 'https://www.google-analytics.com/g/collect';
-    let MPURL = 'https://www.facebook.com/tr/';
-
-    url = new URL(url, window.location);
-    if (url.origin + url.pathname === GAURL) {
-      url = new URL('https://api.angelytics.ai/g-event' + url.search + url.hash);
-    } else if (url.origin + url.pathname === MPURL) {
-      url = new URL('https://api.angelytics.ai/fb-event' + url.search + url.hash);
-    }
-
-    console.log("Beacon request url", url.href); // Log the URL
-    return oldSendBeacon.call(navigator, url.toString(), data);
+    return originalSendBeacon.call(navigator, getUrl(url).toString(), data);
   };
-
-
-
 
   // Remove script node from dom.
   sc.remove();
