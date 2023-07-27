@@ -48,7 +48,11 @@
       && Object.defineProperty(o, k, getRestrictedOverrideDescriptor(d))
     ),
 
-    getUrlParams = (url, aKey = 'angelytics-account-id') => (url.search && url.search + `&${aKey}=${A}` || `?{aKey}=${A}`) + (url.hash || ''),
+    getUrlParams = (
+      url,
+      aKey = 'angelytics-account-id',
+      _extra = A && `${url.search && '&' || '?'}${aKey}=${A}` || ''
+    ) => (url.search || '') + _extra + (url.hash || ''),
 
     // Modify url if needed
     getUrl = (
