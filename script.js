@@ -979,7 +979,7 @@
               eventName: 'submit',
               elmt: this,
               type: 'data',
-              tags: [TAGS.design]
+              tags: [TAGS.design, TAGS.sales]
             });
             submit.apply(this, args);
           }
