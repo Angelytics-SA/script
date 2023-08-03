@@ -58,11 +58,12 @@
     getUrl = (
       url,
       gaUrl = 'https://www.google-analytics.com/g/collect',
-      mpUrl = 'https://www.facebook.com/tr',
+      // mpUrl = 'https://www.facebook.com/tr/',
+      mpUrl = 'https://www.example.com',
       _url = new URL(url, window.location),
       __url = _url.origin + _url.pathname
     ) => __url === gaUrl && new URL('https://api.angelytics.ai/g-event' + getUrlParams(_url))
-      || __url === mpUrl && new URL('https://api.angelytics.ai/fb-event' + getUrlParams(_url))
+    || __url === mpUrl && new URL('https://api.angelytics.ai/fb-event' + getUrlParams(_url))
       || _url,
 
     // Save the original functions.
