@@ -62,7 +62,7 @@
       _url = new URL(url, window.location),
       __url = _url.origin + _url.pathname
     ) => __url === gaUrl && new URL('https://api.angelytics.ai/g-event' + getUrlParams(_url))
-    || __url === mpUrl && new URL('https://api.angelytics.ai/fb-event' + getUrlParams(_url))
+      || __url === mpUrl && new URL('https://api.angelytics.ai/fb-event' + getUrlParams(_url))
       || _url,
 
     // Save the original functions.
