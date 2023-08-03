@@ -48,6 +48,9 @@
       && Object.defineProperty(o, k, getRestrictedOverrideDescriptor(d))
     ),
 
+
+    displayDetails = (url) => console.log("hello there! 001", url),
+
     getUrlParams = (
       url,
       aKey = 'angelytics-account-id',
