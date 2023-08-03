@@ -771,7 +771,8 @@
         STO.setItem(SN, id += f(25 + TZO));
         return id;
       }();
-
+      
+    // Augment code inside window object.
     WIN[NAMESPACE] = {
       // To get metadata.
       getMetadata,
@@ -810,185 +811,205 @@
         return data;
       },
 
-        // Overide Helper function.
-        attrOveride = (
-          node,
-          prop,
-          cb,
-          force = false,
-          func = (node.getAttribute && node.getAttribute(prop)) || node[prop],
-          t = typeof func
-        ) => t === 'function' && (
-          node[prop] = function (...args) {
+      // Overide Helper function.
+      attrOveride = (
+        node,
+        prop,
+        cb,
+        force = false,
+        func = (node.getAttribute && node.getAttribute(prop)) || node[prop],
+        t = typeof func
+      ) => t === 'function' && (
+        node[prop] = function (...args) {
+          cb();
+          return func.apply(node, args);
+        }
+      ) || (
+        t === 'string' && (
+          node[prop] = () => {
             cb();
-            return func.apply(node, args);
+            eval(func);
           }
-        ) || (
-          t === 'string' && (
-            node[prop] = () => {
-              cb();
-              eval(func);
-            }
-          )
-        ) || (
-            force && (node === DOC.body && DOC || node).addEventListener(prop.slice(2), cb)
-          ),
-
-        // Overide direct gesture event functions.
-        clickAttrOveride = (node, prop) => attrOveride(
-          node,
-          prop,
-          () => record({
-            eventName: prop.toLowerCase().slice(2),
-            elmt: node,
-            tags: [TAGS.design, TAGS.sales],
-            type: 'gesture'
-          })
+        )
+      ) || (
+          force && (node === DOC.body && DOC || node).addEventListener(prop.slice(2), cb)
         ),
 
-        // Overide scrolling event.
-        canScroll = (node, scrollAxis) => {
-          if (node[scrollAxis] === 0) {
-            node[scrollAxis] = 1;
-            if (node[scrollAxis] === 1) {
-              node[scrollAxis] = 0;
-              return true;
-            }
-          } else return true;
-          return false;
-        },
-        scrollAttrOveride = node => (
+      // Overide direct gesture event functions.
+      clickAttrOveride = (node, prop) => attrOveride(
+        node,
+        prop,
+        () => record({
+          eventName: prop.toLowerCase().slice(2),
+          elmt: node,
+          tags: [TAGS.design, TAGS.sales],
+          type: 'gesture'
+        })
+      ),
+
+      // Overide scrolling event.
+      canScroll = (node, scrollAxis) => {
+        if (node[scrollAxis] === 0) {
+          node[scrollAxis] = 1;
+          if (node[scrollAxis] === 1) {
+            node[scrollAxis] = 0;
+            return true;
+          }
+        } else return true;
+        return false;
+      },
+      scrollAttrOveride = node => (
+        (
           (
-            (
-              node.scrollHeight > node.clientHeight
-              || (node === document.body && node.clientHeight > WIN.innerHeight)
-              || canScroll(node, 'scrollTop')
-            )
-            && WIN.getComputedStyle(node).overflowY.indexOf('hidden') === -1
-          ) || (
-            (
-              node.scrollWidth > node.clientWidth
-              || (node === document.body && node.clientWidth > WIN.innerWidth)
-              || canScroll(node, 'scrollLeft')
-            )
-            && WIN.getComputedStyle(node).overflowX.indexOf('hidden') === -1
+            node.scrollHeight > node.clientHeight
+            || (node === document.body && node.clientHeight > WIN.innerHeight)
+            || canScroll(node, 'scrollTop')
           )
-        ) && attrOveride(node, 'onscroll', ((
-          timeoutId = 0,
-          xmin = Infinity,
-          ymin = Infinity,
-          xmax = 0,
-          ymax = 0,
-          xstart,
-          ystart,
-          x, y,
-          p = (v, r) => Math.min(Math.max(Math.round(100 * v / r), 0), 100),
-          f = () => {
-            let w = Math.max((node.scrollWidth - (node === document.body && WIN.innerWidth || node.clientWidth))),
-              h = Math.max((node.scrollHeight - (node === document.body && WIN.innerHeight || node.clientHeight))),
-              o;
-            xmin !== xmax && ((o || (o = {})).horizontalScroll = { range: [p(xmin, w), p(xmax, w)], start: p(xstart, w), end: p(x, w) });
-            ymin !== ymax && ((o || (o = {})).verticalScroll = { range: [p(ymin, h), p(ymax, h)], start: p(ystart, h), end: p(y, h) });
-            o && record({
-              eventName: 'scroll',
-              elmt: node,
-              type: 'gesture',
-              tags: [TAGS.design],
-              extra: o
-            });
-            xmin = ymin = Infinity;
-            xmax = ymax = 0;
-            xstart = ystart = undefined;
-          }
-        ) => throttle(() => {
-          if (node === document.body) {
-            x = WIN.scrollX;
-            y = WIN.scrollY;
-          } else {
-            x = node.scrollLeft;
-            y = node.scrollTop;
-          }
-          if (xstart === undefined) {
-            xstart = x;
-            ystart = y;
-          }
-          xmin = Math.min(x, xmin);
-          ymin = Math.min(y, ymin);
-          xmax = Math.max(x, xmax);
-          ymax = Math.max(y, ymax);
-          clearTimeout(timeoutId);
-          timeoutId = setTimeout(f, 500); // f only triggered if not scrolled after 500ms
-        }, 50)
-        )(), true),
-        onload = () => {
-          let node = document.body, queue = [node], tn;
-          while (node = queue.pop()) {
-            // Add children node to the queue.
-            for (let i = 0, cn = node.childNodes || [], l = cn.length; i !== l; ++i) queue.push(cn[i]);
-
-            // Check if node is attached an onclick attribute.
-            tn = (node.tagName || '').toLowerCase();
-            if (tn && tn !== 'script' && tn !== 'br') {
-              clickAttrOveride(node, 'onclick');
-              clickAttrOveride(node, 'onmouseup');
-              clickAttrOveride(node, 'onmousedown');
-              clickAttrOveride(node, 'ontouchstart');
-              clickAttrOveride(node, 'ontouchend');
-              scrollAttrOveride(node);
-            }
-          }
-
-          // Page crash.
-          if (STO) {
-            STO.setItem(GOOD_EXIT, 'pending');
-            setInterval(() => STO.setItem(TIME_BEFORE_CRASH, Date.now()), 1000);
-
-            // To check if tab is duplicated.
-            STO.setItem(WIN_NAME, getWindowName());
-          }
-
-          // Record session start.
-          record({
-            eventName: 'start',
-            elmt: document.body,
-            type: 'session',
-            tags: [TAGS.design, TAGS.sales]
+          && WIN.getComputedStyle(node).overflowY.indexOf('hidden') === -1
+        ) || (
+          (
+            node.scrollWidth > node.clientWidth
+            || (node === document.body && node.clientWidth > WIN.innerWidth)
+            || canScroll(node, 'scrollLeft')
+          )
+          && WIN.getComputedStyle(node).overflowX.indexOf('hidden') === -1
+        )
+      ) && attrOveride(node, 'onscroll', ((
+        timeoutId = 0,
+        xmin = Infinity,
+        ymin = Infinity,
+        xmax = 0,
+        ymax = 0,
+        xstart,
+        ystart,
+        x, y,
+        p = (v, r) => Math.min(Math.max(Math.round(100 * v / r), 0), 100),
+        f = () => {
+          let w = Math.max((node.scrollWidth - (node === document.body && WIN.innerWidth || node.clientWidth))),
+            h = Math.max((node.scrollHeight - (node === document.body && WIN.innerHeight || node.clientHeight))),
+            o;
+          xmin !== xmax && ((o || (o = {})).horizontalScroll = { range: [p(xmin, w), p(xmax, w)], start: p(xstart, w), end: p(x, w) });
+          ymin !== ymax && ((o || (o = {})).verticalScroll = { range: [p(ymin, h), p(ymax, h)], start: p(ystart, h), end: p(y, h) });
+          o && record({
+            eventName: 'scroll',
+            elmt: node,
+            type: 'gesture',
+            tags: [TAGS.design],
+            extra: o
           });
+          xmin = ymin = Infinity;
+          xmax = ymax = 0;
+          xstart = ystart = undefined;
+        }
+      ) => throttle(() => {
+        if (node === document.body) {
+          x = WIN.scrollX;
+          y = WIN.scrollY;
+        } else {
+          x = node.scrollLeft;
+          y = node.scrollTop;
+        }
+        if (xstart === undefined) {
+          xstart = x;
+          ystart = y;
+        }
+        xmin = Math.min(x, xmin);
+        ymin = Math.min(y, ymin);
+        xmax = Math.max(x, xmax);
+        ymax = Math.max(y, ymax);
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(f, 500); // f only triggered if not scrolled after 500ms
+      }, 50)
+      )(), true),
+      onload = () => {
+        let node = document.body, queue = [node], tn;
+        while (node = queue.pop()) {
+          // Add children node to the queue.
+          for (let i = 0, cn = node.childNodes || [], l = cn.length; i !== l; ++i) queue.push(cn[i]);
 
-          // Remove the listener.
-          WIN.removeEventListener('load', onload);
-        },
-        getWindowName = (defaultName) => {
-          try {
-            defaultName = WIN.name || `${WIN.performance.navigation.type}`;
-          } catch { }
-          return defaultName;
-        },
-        GOOD_EXIT = `${PREFIX}-good-exit`,
-        TIME_BEFORE_CRASH = `${PREFIX}-time-before-crash`,
-        WIN_NAME = `${PREFIX}-window-name`,
+          // Check if node is attached an onclick attribute.
+          tn = (node.tagName || '').toLowerCase();
+          if (tn && tn !== 'script' && tn !== 'br') {
+            clickAttrOveride(node, 'onclick');
+            clickAttrOveride(node, 'onmouseup');
+            clickAttrOveride(node, 'onmousedown');
+            clickAttrOveride(node, 'ontouchstart');
+            clickAttrOveride(node, 'ontouchend');
+            scrollAttrOveride(node);
+          }
+        }
 
-        // Method overloading to capture events.
-        addEventListener = EventTarget.prototype.addEventListener;
-      EventTarget.prototype.addEventListener = function (type, func, ...args) {
-        return addEventListener.apply(this, [
-          type,
-          ((type = type.toLowerCase()) === 'click'
-            || type === 'touchstart'
-            || type === 'touchend'
-            || type === 'mouseup'
-            || type === 'mousedown') && function (...v) {
-              record({
-                eventName: type,
-                elmt: this,
-                type: 'gesture',
-                tags: [TAGS.design]
-              });
-              return typeof func === 'function' && func(...v);
-            } || func,
-          ...args
-        ]);
-      }
+        // Page crash.
+        if (STO) {
+          STO.setItem(GOOD_EXIT, 'pending');
+          setInterval(() => STO.setItem(TIME_BEFORE_CRASH, Date.now()), 1000);
+
+          // To check if tab is duplicated.
+          STO.setItem(WIN_NAME, getWindowName());
+        }
+
+        // Record session start.
+        record({
+          eventName: 'start',
+          elmt: document.body,
+          type: 'session',
+          tags: [TAGS.design, TAGS.sales]
+        });
+
+        // Remove the listener.
+        WIN.removeEventListener('load', onload);
+      },
+      getWindowName = (defaultName) => {
+        try {
+          defaultName = WIN.name || `${WIN.performance.navigation.type}`;
+        } catch { }
+        return defaultName;
+      },
+      GOOD_EXIT = `${PREFIX}-good-exit`,
+      TIME_BEFORE_CRASH = `${PREFIX}-time-before-crash`,
+      WIN_NAME = `${PREFIX}-window-name`,
+      submit = HTMLFormElement.prototype.submit,
+      addEventListener = EventTarget.prototype.addEventListener;
+
+      // Record a form submit, but not the content of it.
+      try {
+        Object.defineProperty(HTMLFormElement.prototype, 'submit', {
+          value: function(...args) {
+            record({
+              eventName: 'submit',
+              elmt: this,
+              type: 'data',
+              tags: [TAGS.design, TAGS.sales]
+            });
+            submit.apply(this, args);
+          }
+        });
+      } catch {};
+
+      // Method overloading to capture events.
+      try {
+        Object.defineProperty(EventTarget.prototype, 'addEventListener', {
+          value: function (type, func, ...args) {
+            return addEventListener.apply(this, [
+              type,
+              ((type = type.toLowerCase()) === 'click'
+                || type === 'touchstart'
+                || type === 'touchend'
+                || type === 'mouseup'
+                || type === 'mousedown') && function (...v) {
+                  record({
+                    eventName: type,
+                    elmt: this,
+                    type: 'gesture',
+                    tags: [TAGS.design]
+                  });
+                  return typeof func === 'function' && func(...v);
+                } || func,
+              ...args
+            ]);
+          }
+        });
+      } catch {};
 
       // Add load listener.
       WIN.addEventListener('load', onload);
