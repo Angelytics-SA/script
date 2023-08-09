@@ -9,8 +9,8 @@
   ],
 
     DOC = document,
-
-    cookies = (DOC.cookie || '').split(/;s+|;/g).map(s => (s || '').split(/s+=s+|s+=|=\s+|=/)),
+    getCookies = (s = DOC.cookie) => (s || '').split(/;s+|;/g).map(s => (s || '').split(/s+=s+|s+=|=\s+|=/)),
+    cookies = getCookies(),
 
     // Get current script parameters.
     scs = DOC.getElementsByTagName && DOC.getElementsByTagName('script'),
@@ -156,18 +156,37 @@
        || ipv6Re.test(s)
        || macRe.test(s)
     ),
-    gaRe = /_ga|ga/i,
-    mpRe = /_fbp|fbp/i,
+    gaRe = /(_|)ga|(_|)utm[a-z]/i,
+    mpRe = /(_|)fbp/i,
+    otherRe = /(_|)(g|)id/i,
     isKeySensitive = s && (
       gaRe.test(s)
       || mpRe.test(s)
+      || otherRe.test(s)
     ),
-    isSensitive = (k, v) => isKeySensitive(k) || isValueSensitive(v);
+    isSensitive = (k, v) => isKeySensitive(k) || isValueSensitive(v),
+    cookieDesc = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie') ||
+                 Object.getOwnPropertyDescriptor(HTMLDocument.prototype, 'cookie');
   
   // Filter cookies that contains sensitive data.
   for (let i = 0, l = cookies.length; i !== l; ++i) {
     const [k, v] = cookies[i] || [];
     isSensitive(k, v) && (DOC.cookie = `${k}=; expires=${new Date(Date.now() - 120000).toUTCString()}; max-age=-99999999`);
+  }
+
+  // Prevent the creation of new sensitive cookies.
+  if (cookieDesc && cookieDesc.configurable) {
+    Object.defineProperty(DOC, 'cookie', {
+      get: function () {
+        return cookieDesc.get.call(DOC);
+      },
+      set: function (val) {
+        let c = getCookies(val), sensitive = false, i = 0, l = c.length;
+        for (; i !== l && !sensitive; ++i) sensitive = isSensitive(...c[i]);
+        sensitive || cookieDesc.set.call(DOC, val);
+        return val;
+      }
+    });
   }
 
   // Remove script node from dom.
