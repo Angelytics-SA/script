@@ -6,11 +6,35 @@ const DOMParser = new (require('jsdom').JSDOM)().window.DOMParser;
  * @param  {URL} url The input url
  * @return {String}  The url domain name
  */
-URL.domain || (URL.domain = url => (
-  (url instanceof URL && url || (url = new URL(url))).protocol + '//' + url.hostname
+URL.getDomain || (URL.getDomain = (
+  url,
+  protocol = (url instanceof URL && url || (url = new URL(url))).protocol || '',
+  hostname = url.hostname || ''
+) => (
+  (protocol.charAt(protocol.length - 1) === '/' && protocol || `${protocol}//`) + hostname
 ));
-URL.prototype.domain || (URL.prototype.domain = function() {
-  return URL.domain(this);
+URL.prototype.domain || Object.defineProperty(URL.prototype, 'domain', {
+  get () {
+    return URL.getDomain(this);
+  }
+});
+
+/**
+ * Get the url page name. Does not capture search params or passwords.
+ * @param  {URL} url The input url
+ * @return {String}  The url domain name
+ */
+URL.getPageOrigin || (URL.getPageOrigin = (
+  url,
+  origin = (url instanceof URL && url || (url = new URL(url))).origin || '',
+  pathname = url.pathname || ''
+) => (
+  origin + pathname
+));
+URL.prototype.pageOrigin || Object.defineProperty(URL.prototype, 'pageOrigin', {
+  get () {
+    return URL.getPageOrigin(this);
+  }
 });
 
 /**
