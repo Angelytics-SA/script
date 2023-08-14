@@ -114,6 +114,8 @@ const process = async (url, crawler, indexedPages) => {
     if (p) {
       indexedPages.set(u + '/', Array.from(new Set([...p, ...(v || [])])));
       indexedPages.delete(u);
+    } else {
+      indexedPages.set(u, Array.from(new Set(v || [])));
     }
   });
 
