@@ -21,7 +21,6 @@ const chalk = require('chalk');
 class Crawler {
   // Private members.
   #browser;
-  #currentPage;
   #defaultParameters;
   #started;
 
@@ -34,18 +33,11 @@ class Crawler {
   }
 
   // Current page getter.
-  get currentPage() { return this.#currentPage; }
   get started() { return this.#started; }
 
   // Start session.
   async start(parameters) {
-    const {
-      listenToCurrentPageConsole,
-      ...params
-    } = parameters || {};
-    this.#browser = await puppeteer.launch({...this.#defaultParameters, ...params});
-    this.#currentPage = await this.#browser.newPage();
-    listenToCurrentPageConsole && await listenToPageConsole(this.#currentPage);
+    this.#browser = await puppeteer.launch({...this.#defaultParameters, ...(parameters || {})});
     this.#started = true;
     return this;
   }
@@ -57,30 +49,37 @@ class Crawler {
     return this;
   }
 
-  // Go to a specify url.
-  async goto(url, ...args) {
-    url instanceof URL && (url = url.toString());
-    await this.#currentPage.goto(url, ...args);
-    return this;
-  }
-
-  // Get the whole html, stringified.
-  async getContent(page = this.#currentPage) {
-    return await page.content();
+  // Evaluate a function on a page.
+  async evaluate(...args) {
+    return await evaluate(...args);
   }
 
   // Evaluate a function on a page.
-  async evaluate(func = () => document, page = this.#currentPage) {
-    let handle = await page.evaluateHandle(func), res;
-    try {
-      res = await handle.jsonValue();
-    } catch (e) {
-      console.error(new Error(e));
-      res = null;
+  async createPage(showPageConsole = false) {
+    const page = await this.#browser.newPage(), goto = page.goto;
+    page.goto = async function(url, ...args) {
+      url instanceof URL && (url = url.toString());
+      return goto.apply(page, [url, ...args]);
     }
-    await handle.dispose();
-    return res;
+    showPageConsole && await listenToPageConsole(page);
+    return page;
   }
+}
+
+// Default evaluate function.
+const evaluateDefaultFunc = () => document;
+
+// Helper function to evaluate a page.
+const evaluate = async (func = evaluateDefaultFunc, page) => {
+  let handle = await page.evaluateHandle(func), res;
+  try {
+    res = await handle.jsonValue();
+  } catch (e) {
+    console.error(new Error(e));
+    res = null;
+  }
+  await handle.dispose();
+  return res;
 }
 
 // Helper function to make args accessible
@@ -114,5 +113,7 @@ const listenToPageConsole = async page => {
   return page;
 }
 
+
 // Exports.
+Crawler.evaluate = evaluate;
 module.exports = Crawler.Crawler = Crawler;

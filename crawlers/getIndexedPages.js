@@ -1,4 +1,4 @@
-const { Crawler } = require('./core');
+const { Crawler, evaluate } = require('./core');
 
 // Default crawler.
 let CRAWLER;
@@ -9,11 +9,29 @@ const getGoogleSearchQuery = (url, num = 100, start = 0) => (
   `https://www.google.com/search?q=site:${url}&num=${num}&start=${start}`
 );
 
-// Crawl google search.
-const crawlGoogleSearch = async (url, crawler, output = []) => {
-  output || (output = []);
+// Build a Bing search query.
+// num = 1-100.
+const getBingSearchQuery = (url, num = 100, start = 0) => (
+  `https://www.bing.com/search?q=site:${url}&count=${num}&first=${start}&answerCount=${num}&offset=${start}`
+);
+
+// Build a Yahoo search query.
+// num = 1-100.
+const getYahooSearchQuery = (url, num = 100, start = 0) => (
+  `https://search.yahoo.com/search?p=site:${url}&n=${num}&b=${start}`
+);
+
+// For Bing, the parameter is count=## where ## can be anything from 1-100.
+// For Yahoo, the parameter is n=## where ## can be anything from 1-100.
+
+// Crawl search.
+const crawlSearch = async (
+  url,
+  page,
+  getSearchQueryFunc = getGoogleSearchQuery
+) => {
   let query,
-    num = 100,
+    num = 10,
     start = 0,
     results,
     found = true,
@@ -26,52 +44,78 @@ const crawlGoogleSearch = async (url, crawler, output = []) => {
       return output;
     },
     i,
-    l;
+    l,
+    r,
+    output = new Set;
+
+  page instanceof Crawler && (page = await page.createPage());
 
   while (found) {
     // Form the query.
-    query = getGoogleSearchQuery(url, num, start);
+    query = getSearchQueryFunc(url, num, start);
 
     // Get all the document anchors.
-    await crawler.goto(query);
-    results = await crawler.evaluate(getAnchors) || [];
+    await page.goto(query);
+    results = await evaluate(getAnchors, page) || [];
 
     // Filter out anchors that don't start with the url.
-    found = false;
+    found = output.size;
     for (i = 0, l = results.length; i !== l; ++i) {
-      (results[i] || '').trim().startsWith(url) && (output.push(results[i]), found = true);
+      (r = (results[i] || '').trim()).startsWith(url) && output.add(r);
     }
+    found = output.size - found;
 
     // Next page.
     start += num;
   }
 
-  return output;
+  return Array.from(output);
 }
+
+const searchEngines = [
+  ['google', getGoogleSearchQuery],
+  ['bing', getBingSearchQuery],
+  ['yahoo', getYahooSearchQuery]
+];
 
 // Process function, assuming the crawler initialization, start and end will be tackled outside.
 const process = async (url, crawler, indexedPages) => {
   // Init indexed pages.
-  indexedPages instanceof Set 
+  indexedPages instanceof Map 
   || (indexedPages && (
-    indexedPages = new Set(Array.isArray(indexedPages) && indexedPages || [indexedPages])
+    indexedPages = new Map((Array.isArray(indexedPages) && indexedPages || [indexedPages]).map(p => [p, []]))
   ))
-  || (indexedPages = new Set);
+  || (indexedPages = new Map);
 
   // Add original url.
-  indexedPages.add(URL.getPageOrigin(url));
+  let p = indexedPages.get(url = URL.getPageOrigin(url)) || [];
+  indexedPages.set(url, p);
 
   // Get the domain name.
-  url = (url instanceof URL && url || new URL(url)).origin;
-  indexedPages.add(url);
+  p = indexedPages.get(url = new URL(url).origin) || [];
+  indexedPages.set(url, p);
 
-  // Google search.
-  for (let i = 0, r = await crawlGoogleSearch(url, crawler), l = r.length; i !== l; ++i) {
-    indexedPages.add(URL.getPageOrigin(r[i]));
+  // Search in paralel.
+  const results = await Promise.all(searchEngines.map(([_, queryFunc]) => (
+    crawlSearch(url, crawler, queryFunc)
+  )));
+  for (let i = 0, l = results.length, j, m, r, e; i !== l; ++i) {
+    e = searchEngines[i][0];
+    for (j = 0, r = results[i], m = r.length; j !== m; ++j) {
+      p = indexedPages.get(url = URL.getPageOrigin(r[j])) || [];
+      p.push(e);
+      indexedPages.set(url, p);
+    }
   }
 
   // A little bit of pruning.
-  indexedPages.forEach(u => indexedPages.has(u + '/') && indexedPages.delete(u));
+  indexedPages.forEach((v, u) => {
+    p = indexedPages.get(u + '/');
+    if (p) {
+      indexedPages.set(u + '/', Array.from(new Set([...p, ...(v || [])])));
+      indexedPages.delete(u);
+    }
+  });
 
   return Array.from(indexedPages);
 }
