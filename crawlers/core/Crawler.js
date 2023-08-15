@@ -1,6 +1,7 @@
 // Get headless browser.
 const puppeteer = require('puppeteer');
 const chalk = require('chalk');
+const asyncify = require('../../../utils/asyncify');
 
 /**
  * Simple wrapper class around puppeteer.
@@ -64,14 +65,43 @@ class Crawler {
     showPageConsole && await listenToPageConsole(page);
     return page;
   }
+
+  // Crawl.
+  async crawl(
+    url, // where to start
+    process, // what to do
+  ) { return await crawl(url, process, this); }
+}
+
+// Default crawler.
+let CRAWLER;
+
+// Helper function to crawl.
+const crawl = async (
+  url, // where to start
+  process, // what to do
+  crawler = CRAWLER || (CRAWLER = new Crawler()), // crawler
+  started
+) => {
+  // Init the crawler if needed
+  crawler || (crawler = new Crawler());
+  (started = crawler.started) || await crawler.start();
+  
+  // Get the actual crawling logic.
+  const results = await asyncify(process)(url, crawler);
+  
+  // Close the crawler if need.
+  started || await crawler.end();
+
+  return results;
 }
 
 // Default evaluate function.
 const evaluateDefaultFunc = () => document;
 
 // Helper function to evaluate a page.
-const evaluate = async (func = evaluateDefaultFunc, page) => {
-  let handle = await page.evaluateHandle(func), res;
+const evaluate = async (page, func = evaluateDefaultFunc, ...args) => {
+  let handle = await page.evaluateHandle(func, ...args), res;
   try {
     res = await handle.jsonValue();
   } catch (e) {
@@ -116,4 +146,6 @@ const listenToPageConsole = async page => {
 
 // Exports.
 Crawler.evaluate = evaluate;
+Crawler.crawl = crawl;
+Crawler.CRAWLER = CRAWLER;
 module.exports = Crawler.Crawler = Crawler;

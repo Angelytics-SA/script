@@ -1,7 +1,4 @@
-const { Crawler, evaluate } = require('./core');
-
-// Default crawler.
-let CRAWLER;
+const { Crawler, evaluate, crawl, evalElmtProperty } = require('./core');
 
 // Build a Google search query.
 // num = 10,20,30,40,50,100.
@@ -21,8 +18,6 @@ const getYahooSearchQuery = (url, num = 100, start = 0) => (
   `https://search.yahoo.com/search?p=site:${url}&n=${num}&b=${start}`
 );
 
-// For Bing, the parameter is count=## where ## can be anything from 1-100.
-// For Yahoo, the parameter is n=## where ## can be anything from 1-100.
 
 // Crawl search.
 const crawlSearch = async (
@@ -35,14 +30,6 @@ const crawlSearch = async (
     start = 0,
     results,
     found = true,
-    getAnchors = () => {
-      let anchors = document.querySelectorAll('a'),
-        i = 0,
-        l = anchors.length,
-        output = new Array(l);
-      for (; i !== l; ++i) output[i] = anchors[i].href;
-      return output;
-    },
     i,
     l,
     r,
@@ -56,12 +43,12 @@ const crawlSearch = async (
 
     // Get all the document anchors.
     await page.goto(query);
-    results = await evaluate(getAnchors, page) || [];
+    results = await evalElmtProperty(page, 'a', 'href', true);
 
     // Filter out anchors that don't start with the url.
     found = output.size;
     for (i = 0, l = results.length; i !== l; ++i) {
-      (r = (results[i] || '').trim()).startsWith(url) && output.add(r);
+      (r = results[i]).startsWith(url) && output.add(URL.getPageOrigin(r));
     }
     found = output.size - found;
 
@@ -128,18 +115,8 @@ const process = async (url, crawler, indexedPages) => {
  * @param  {Crawler} crawler The crawler to crawl the input url, optional
  * @return {Array}           The array of indexed page urls
  */
-const getIndexedPages = async (url, crawler = CRAWLER || (CRAWLER = new Crawler()), started) => {
-  // Init the crawler if needed
-  crawler || (crawler = new Crawler());
-  (started = crawler.started) || await crawler.start();
-  
-  // Get the indexed pages.
-  const indexedPages = await process(url, crawler);
-  
-  // Close the crawler if need.
-  started || await crawler.end();
-
-  return indexedPages;
+const getIndexedPages = async (url, crawler) => {
+  return await crawl(url, process, crawler);
 }
 
 // Exports.

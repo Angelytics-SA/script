@@ -1,5 +1,6 @@
 // Get DOM parser class.
 const DOMParser = new (require('jsdom').JSDOM)().window.DOMParser;
+const { evaluate } = require('./Crawler');
 
 /**
  * Get the url domain name. Does not capture the port, contrary to 'origin' method.
@@ -123,9 +124,25 @@ try {
   Node.prototype.toString = function() { return stringifyNode(this); }
 } catch {}
 
+// Utils to evaluate an element property.
+const _evalElmtProperty = (selector, property, trim) => {
+  let elements = document.querySelectorAll(selector) || [],
+    i = 0,
+    l = elements.length,
+    output = new Array(l);
+
+  if (trim) for (; i !== l; ++i) output[i] = (elements[i][property] || '').trim();
+  else for (; i !== l; ++i) output[i] = elements[i][property];
+
+  return output;
+}, evalElmtProperty = async (page, selector, property, trim) => (
+  await evaluate(page, _evalElmtProperty, selector, property, trim )
+);
+
 // Exports.
 module.exports = {
   fetchContent,
   getNodeAttributes,
-  stringifyNode
+  stringifyNode,
+  evalElmtProperty
 };
