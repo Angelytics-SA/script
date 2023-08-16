@@ -77,6 +77,11 @@ const process = async (url, crawler, map, base) => {
     queue = queue.slice(length);
   }
 
+  // Close pages.
+  await Promise.all(pages.map(p => p.close()))
+  pages.length = 0;
+  pages = null;
+
   return Array.from(map).map(([u, s]) => [u, Array.from(s || [])]);
 }
 

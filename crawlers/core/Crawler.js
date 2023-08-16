@@ -58,9 +58,9 @@ class Crawler {
   // Evaluate a function on a page.
   async createPage(showPageConsole = false) {
     const page = await this.#browser.newPage(), goto = page.goto;
-    page.goto = async function(url, ...args) {
+    page.goto = async function(url, options) {
       url instanceof URL && (url = url.toString());
-      return goto.apply(page, [url, ...args]);
+      return goto.apply(page, [url, { timeout: 60000, ...(options || {}) }]);
     }
     showPageConsole && await listenToPageConsole(page);
     return page;
@@ -81,14 +81,28 @@ const crawl = async (
   url, // where to start
   process, // what to do
   crawler = CRAWLER || (CRAWLER = new Crawler()), // crawler
-  started
+  started,
+  results
 ) => {
   // Init the crawler if needed
   crawler || (crawler = new Crawler());
+
+  // If options are passed instead of the crawler itself
+  typeof crawler === 'object' && !(crawler instanceof Crawler) && (crawler = new Crawler(crawler));
+
+  // If crawler not started yet.
   (started = crawler.started) || await crawler.start();
   
   // Get the actual crawling logic.
-  const results = await asyncify(process)(url, crawler);
+  if (typeof process === 'function') {
+    results = await asyncify(process)(url, crawler);
+  } else if (Array.isArray(process)) {
+    results = await Promise.all(process.map(p => asyncify(p)(url, crawler)));
+  } else {
+    // Close the crawler if need.
+    started || await crawler.end();
+    throw Error('process must be a function or an array of function');
+  }
   
   // Close the crawler if need.
   started || await crawler.end();

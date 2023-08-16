@@ -114,6 +114,11 @@ const process = async (url, crawler, sitemap, base) => {
     queue = queue.slice(length);
   }
 
+  // Close pages.
+  await Promise.all(pages.map(p => p.close()))
+  pages.length = 0;
+  pages = null;
+
   return Array.from(sitemap).map(([u, s]) => [u, Array.from(s || [])]);
 }
 

@@ -33,9 +33,10 @@ const crawlSearch = async (
     i,
     l,
     r,
-    output = new Set;
+    output = new Set,
+    pageCreated;
 
-  page instanceof Crawler && (page = await page.createPage());
+  page instanceof Crawler && (pageCreated = true, page = await page.createPage());
 
   while (found) {
     // Form the query.
@@ -55,6 +56,9 @@ const crawlSearch = async (
     // Next page.
     start += num;
   }
+
+  // Close page.
+  pageCreated && (await page.close(), page = null);
 
   return Array.from(output);
 }
