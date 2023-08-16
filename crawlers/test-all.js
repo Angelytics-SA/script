@@ -5,6 +5,8 @@
  * Then type: node crawlers/test-all.js
  * 
  * WARNING: it can take several minute to process the whole pipeline.
+ * 
+ * ALSO: see createSitemapXmlContent.js to create a .xml sitemap file content.
  *  
  */
 
