@@ -9,5 +9,6 @@
 (async url => {
   // Testing sitemap.
   const sitemap = await require('./getSitemap')(url);
-  console.log('Sitemap', sitemap.length, sitemap);
+  console.log('Sitemap', sitemap);
+  console.log('# Results:', sitemap.length);
 })('https://hoophouseusa.com'); // 'https://www.freshpaint.io/'

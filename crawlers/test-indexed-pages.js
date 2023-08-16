@@ -9,5 +9,6 @@
 (async url => {
   // Testing indexed pages.
   const indexedPages = await require('./getIndexedPages')(url);
-  console.log('Indexed pages', indexedPages.length, indexedPages);
+  console.log('Indexed pages', indexedPages);
+  console.log('# Results:', indexedPages.length);
 })('https://hoophouseusa.com'); // 'https://www.freshpaint.io/'

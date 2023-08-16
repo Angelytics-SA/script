@@ -9,5 +9,6 @@
 (async url => {
   // Testing website map generation.
   const map = await require('./generateWebsiteMap')(url);
-  console.log('Website map', map, map.length);
+  console.log('Website map', map);
+  console.log('# Results:', map.length);
 })('https://hoophouseusa.com'); // 'https://www.freshpaint.io/'
