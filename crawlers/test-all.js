@@ -12,7 +12,7 @@ const { process: getIndexedPages } = require('./getIndexedPages');
 const { crawl } = require('./core');
 
 (async url => {
-  // Testing website map generation.
+  // Testing website map generation, sitemap crawling and SERP.
   const [
     map,
     sitemap,
