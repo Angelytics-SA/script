@@ -9,7 +9,7 @@
   ],
 
     DOC = document,
-    getCookies = (s = DOC.cookie) => (s || '').split(/;s+|;/g).map(s => (s || '').split(/s+=s+|s+=|=\s+|=/)),
+    getCookies = (s = DOC.cookie) => (s || '').split(/\s+;\s+|;\s+|\s+;|;/g).map(s => (s || '').split(/\s+=\s+|\s+=|=\s+|=/)),
     cookies = getCookies(),
 
     // Get current script parameters.

@@ -20,6 +20,7 @@ const addToQueue = (url, queue, visited) => {
 // Sub-process. Takses care of different ways of crawling the website.
 const subprocess = async (url, page, base) => {
   await page.goto(url);
+
   let res = [],
     i,
     l,
@@ -41,7 +42,7 @@ const process = async (url, crawler, map, base) => {
   // Init emap.
   map instanceof Map 
   || (map && (
-    map = new Map((Array.isArray(map) && map || [map]).map(p => [p, []]))
+    map = new Map((Array.isArray(map) || (map && [map]) || []).map(p => [p, []]))
   ))
   || (map = new Map);
 

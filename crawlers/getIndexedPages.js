@@ -36,6 +36,7 @@ const crawlSearch = async (
     output = new Set,
     pageCreated;
 
+  // In case no page is created yet, let the crawler do it.
   page instanceof Crawler && (pageCreated = true, page = await page.createPage());
 
   while (found) {
@@ -74,7 +75,7 @@ const process = async (url, crawler, indexedPages) => {
   // Init indexed pages.
   indexedPages instanceof Map 
   || (indexedPages && (
-    indexedPages = new Map((Array.isArray(indexedPages) && indexedPages || [indexedPages]).map(p => [p, []]))
+    indexedPages = new Map((Array.isArray(indexedPages) || (indexedPages && [indexedPages]) || []).map(p => [p, []]))
   ))
   || (indexedPages = new Map);
 

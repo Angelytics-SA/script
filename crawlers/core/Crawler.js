@@ -92,16 +92,32 @@ const crawl = async (
 
   // If crawler not started yet.
   (started = crawler.started) || await crawler.start();
-  
-  // Get the actual crawling logic.
-  if (typeof process === 'function') {
-    results = await asyncify(process)(url, crawler);
-  } else if (Array.isArray(process)) {
-    results = await Promise.all(process.map(p => asyncify(p)(url, crawler)));
-  } else {
+
+  // Check if input url is valid.
+  if (!(typeof url === 'string' || url instanceof URL || Array.isArray(url))) {
     // Close the crawler if need.
     started || await crawler.end();
-    throw Error('process must be a function or an array of function');
+    throw Error('url must be a string or an array of strings');
+  }
+
+  // Check if input process is valid.
+  if (!(typeof process === 'function' || Array.isArray(process))) {
+    // Close the crawler if need.
+    started || await crawler.end();
+    throw Error('process must be a function or an array of functions');
+  }
+  
+  // Get the actual crawling logic.
+  if (typeof url === 'string' && typeof process === 'function') {
+    results = await asyncify(process)(url, crawler);
+  } else if (typeof url === 'string' && Array.isArray(process)) {
+    results = await Promise.all(process.map(p => asyncify(p)(url, crawler)));
+  } else if (Array.isArray(url) && typeof process === 'function') {
+    process = asyncify(process);
+    results = await Promise.all(url.map(u => process(u, crawler)));
+  } else if (Array.isArray(url) && Array.isArray(process)) {
+    process = process.map(p => asyncify(p));
+    results = await Promise.all(url.map(u => Promise.all(process.map(p => p(u, crawler)))));
   }
   
   // Close the crawler if need.

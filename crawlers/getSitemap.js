@@ -75,7 +75,7 @@ const process = async (url, crawler, sitemap, base) => {
   // Init sitemap.
   sitemap instanceof Map 
   || (sitemap && (
-    sitemap = new Map((Array.isArray(sitemap) && sitemap || [sitemap]).map(p => [p, []]))
+    sitemap = new Map((Array.isArray(sitemap) || (sitemap && [sitemap]) || []).map(p => [p, []]))
   ))
   || (sitemap = new Map);
 
