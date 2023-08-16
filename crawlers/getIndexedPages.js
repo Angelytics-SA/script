@@ -97,13 +97,7 @@ const process = async (url, crawler, indexedPages) => {
 
   // A little bit of pruning.
   indexedPages.forEach((v, u) => {
-    p = indexedPages.get(u + '/');
-    if (p) {
-      indexedPages.set(u + '/', Array.from(new Set([...p, ...(v || [])])));
-      indexedPages.delete(u);
-    } else {
-      indexedPages.set(u, Array.from(new Set(v || [])));
-    }
+    indexedPages.set(u, Array.from(new Set(v || [])));
   });
 
   return Array.from(indexedPages);

@@ -28,9 +28,10 @@ URL.prototype.domain || Object.defineProperty(URL.prototype, 'domain', {
 URL.getPageOrigin || (URL.getPageOrigin = (
   url,
   origin = (url instanceof URL && url || (url = new URL(url))).origin || '',
-  pathname = url.pathname || ''
+  pathname = url.pathname || '',
+  out = origin + pathname
 ) => (
-  origin + pathname
+  out.charAt(out.length - 1) === '/' && out.slice(0, out.length - 1) || out
 ));
 URL.prototype.pageOrigin || Object.defineProperty(URL.prototype, 'pageOrigin', {
   get () {

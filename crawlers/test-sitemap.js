@@ -7,7 +7,7 @@
  */
 
 (async url => {
-  // Testinf indexed pages.
+  // Testing sitemap.
   const sitemap = await require('./getSitemap')(url);
   console.log('Sitemap', sitemap.length, sitemap);
 })('https://hoophouseusa.com'); // 'https://www.freshpaint.io/'

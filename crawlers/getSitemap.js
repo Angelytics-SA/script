@@ -63,8 +63,8 @@ const subprocess = async (url, page, base) => {
 
   // Dissociate from sub sitemaps (.xml) and sitemap.
   for (i = 0, l = r.length; i !== l; ++i) {
-    Path.extname(v = r[i] || '').toLowerCase() === '.xml' && toBeAdded.push(v)
-      || (v.startsWith(base) && res.push(v));
+    Path.extname(v = (r[i] || '').trim()).toLowerCase() === '.xml' && toBeAdded.push(v)
+      || (v.startsWith(base) && res.push(URL.getPageOrigin(v)));
   }
 
   return [res, toBeAdded];
@@ -100,7 +100,7 @@ const process = async (url, crawler, sitemap, base) => {
 
       // Add results.
       for (let j = 0, m = res.length, r, s; j !== m; ++j) {
-        s = sitemap.get(r = URL.getPageOrigin((res[j] || '').trim())) || new Set;
+        s = sitemap.get(r = res[j]) || new Set;
         s.add(src);
         sitemap.set(r, s);
       }
@@ -110,6 +110,7 @@ const process = async (url, crawler, sitemap, base) => {
         addToQueue(toBeAdded[j], queue, visited);
     }
 
+    // Remove already processed urls.
     queue = queue.slice(length);
   }
 
@@ -117,10 +118,10 @@ const process = async (url, crawler, sitemap, base) => {
 }
 
 /**
- * Get indexed pages. See https://www.browserstack.com/guide/puppeteer-proxy for proxies.
+ * Get sitemap. See https://www.browserstack.com/guide/puppeteer-proxy for proxies.
  * @param  {String}  url     The input url
  * @param  {Crawler} crawler The crawler to crawl the input url, optional
- * @return {Array}           The array of indexed page urls
+ * @return {Array}           The array of page urls
  */
 const getSitemap = async (url, crawler) => {
   return await crawl(url, process, crawler);
