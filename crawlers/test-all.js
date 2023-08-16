@@ -58,7 +58,7 @@ const { getUrlStatus } = require('./getUrlStatus');
   console.log('# website mapped urls', map.length);
   console.log('# sitemap urls', sitemap.length);
   console.log('# indexed pages', indexedPages.length);
-  console.log('urls', analytics.map((a, i) => {
+  console.log('urls', analytics.map(a => {
     const [ok, code] = statuses.get(a[0]);
     return [...a, ok && 'valid' || `broken: ${code}`];
   }));
