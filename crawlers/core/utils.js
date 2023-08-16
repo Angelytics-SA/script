@@ -29,7 +29,7 @@ URL.getPageOrigin || (URL.getPageOrigin = (
   url,
   origin = (url instanceof URL && url || (url = new URL(url))).origin || '',
   pathname = url.pathname || '',
-  out = origin + pathname
+  out = (origin + pathname).trim()
 ) => (
   out.charAt(out.length - 1) === '/' && out.slice(0, out.length - 1) || out
 ));
