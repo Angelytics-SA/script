@@ -3,6 +3,8 @@
  * ------------
  * Open the console, go to the script folder (cd <path>/script)
  * Then type: node crawlers/test-all.js
+ * 
+ * WARNING: it can take several minute to process the whole pipeline.
  *  
  */
 
