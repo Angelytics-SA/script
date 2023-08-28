@@ -69,4 +69,4 @@ const { getUrlStatus } = require('./getUrlStatus');
 
   // End timer.
   console.timeEnd('Process time');
-})('https://hoophouseusa.com'); // 'https://www.freshpaint.io/'
+})('https://www.cheyenneregional.org/'); // 'https://www.freshpaint.io/' // 'https://www.ucsfhealth.org/'

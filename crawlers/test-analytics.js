@@ -10,4 +10,4 @@
   // Testing sitemap.
   const analytics = await require('./getAnalytics')(url);
   console.log('Analytics', analytics);
-})('https://hoophouseusa.com'); // 'https://www.freshpaint.io/'
+})('https://bioplusrx.com/contact/'); // 'https://www.freshpaint.io/'
