@@ -171,6 +171,20 @@
     }
   }
 
+  // Attribute a unique id to each element.
+  // Those elements have to be constructed at rendering time.
+  let m = 0, n = D.body, q = [n], t, i, l, c;
+  while (n = q.pop()) {
+    // Add a unique id if needed.
+    !(t = n.tagName)
+      || (t = t.toLowerCase()) === 'script'
+      || n.id || n.getAttribute('id')
+      || (n.id = `angelytics-unique-${t}-id-${++m}`);
+
+    // Add child nodes to the queue.
+    for (i = 0, c = n.childNodes || [], l = c.length; i !== l; ++i) q.push(c[i]);
+  }
+
   // Remove script node from dom.
   sc.remove();
 })(); // End of code
