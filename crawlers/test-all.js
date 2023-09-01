@@ -69,4 +69,4 @@ const { getUrlStatus } = require('./getUrlStatus');
 
   // End timer.
   console.timeEnd('Process time');
-})('https://www.cheyenneregional.org/'); // 'https://www.freshpaint.io/' // 'https://www.ucsfhealth.org/'
+})('https://pinnacleprimarygroup.com/'); // 'https://www.cheyenneregional.org/' // 'https://www.freshpaint.io/' // 'https://www.ucsfhealth.org/'
