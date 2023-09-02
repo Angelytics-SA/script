@@ -30,30 +30,37 @@
     || sc.getAttribute('data-account-id')
   ),
 
-  // Disable cookie flag is there.
+  // Disable cookie flag.
   dC = sc && (
     sc.hasAttribute('prevent-cookie-tracking')
     || sc.hasAttribute('preventCookieTracking')
     || sc.hasAttribute('prevent-cookies-tracking')
     || sc.hasAttribute('preventCookiesTracking')
   ),
+
+  // Filter out the last '/'.
+  fU = (url, l = url.length) => l > 1 && url.charAt(l) === '/' && url.slice(0, l - 1) || url,
+
+  // A list of urls to re-orient to angelytics endpoints.
+  U = new Map([
+    ['https://www.google-analytics.com/g/collect', 'https://api.angelytics.ai/g-event'],
+    ['https://www.facebook.com/tr', 'https://api.angelytics.ai/fb-event'],
+  ].map(([k, v]) => [fU(k), fu(v)])),
   
+  // Get url parameters.
   gUP = (
     url,
     aKey = 'angelytics-account-id',
     _extra = A && `${url.search && '&' || '?'}${aKey}=${A}` || ''
   ) => (url.search || '') + _extra + (url.hash || ''),
 
-  // Modify url if needed
+  // Modify url if needed.
   gU = (
     url,
-    gaUrl = 'https://www.google-analytics.com/g/collect',
-    mpUrl = 'https://www.facebook.com/tr/',
     _url = new URL(url, W.location),
-    __url = _url.origin + _url.pathname
-  ) => __url === gaUrl && new URL('https://api.angelytics.ai/g-event' + gUP(_url))
-    || __url === mpUrl && new URL('https://api.angelytics.ai/fb-event' + gUP(_url))
-    || _url,
+    __url = fU(_url.origin + _url.pathname),
+    r = U.get(__url)
+  ) => r && new URL(r + gUP(_url)) || _url,
 
   // Save the original functions.
   oO = XMLHttpRequest.prototype.open,
