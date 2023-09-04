@@ -1,5 +1,6 @@
+// NODE_ENV=PROD node bundle -i scripts/analytics/index.js -o scripts/analytics/test/bundled.js
 (() => {
-  const { WIN, NS, TAGS, SC, STO, STO_GE, STO_TBC, STO_WN } = require('./globals');
+  const { WIN, NS, TAGS, SC, STO, STO_GE, STO_TBC, STO_WN, DOC } = require('./globals');
   const send = require('./send');
   const getMetadata = require('./getMetadata');
   let sendCustomEvent = () => {};
@@ -129,5 +130,5 @@
   };
 
   // Remove script node from dom.
-  SC.remove();
-});
+  SC && SC.remove();
+})();

@@ -26,8 +26,8 @@ try {
   Globals.LOC = (WIN.location || location || {}).href;
 
   // Storage.
-  Globals.STO = WIN.sessionStorage || sessionStorage;
-  Globals.STO_PRE = 'aglx';
+  const STO = Globals.STO = WIN.sessionStorage || sessionStorage;
+  const STO_PRE = Globals.STO_PRE = 'aglx';
 
   // Additional storage variables.
   Globals.STO_GE= `${STO_PRE}-good-exit`;

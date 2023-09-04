@@ -1,5 +1,7 @@
-const { WIN } = require('./globals');
+const { WIN, TAGS } = require('./globals');
 const attrOveride = require('./attrOveride');
+const throttle = require('./throttle');
+const record = require('./record');
 
 // Helper function to check if a node can scroll.
 const canScroll = (node, scrollAxis) => {

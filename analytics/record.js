@@ -1,4 +1,5 @@
 const send = require('./send');
+const getMetadata = require('./getMetadata');
 
 (module.exports = ({
   eventName,

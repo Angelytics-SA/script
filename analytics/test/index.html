@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <script>cb = data => console.log('CUSTOM:', data)</script>
+  <script
+    src="./bundled.js"
+    type="text/javascript"
+    account="$2b$10$C7XZ0twPgjfWL406wlImveqDgEfsgUgYZzip4lOWG.ApaXgrn2Zea"
+    callback="cb"
+  ></script>
+</head>
+
+<body>
+  <div id="1" onmousedown="alert('click me')">
+    click me
+  </div>
+  <div id="2">
+    click me too
+  </div>
+  <div id="3">
+    click me last
+  </div>
+  <div id="scroll">
+    
+  </div>
+</body>
+<script>
+  let el = document.getElementById("2"), data = '';
+  el.onclick = () => alert('click me too');
+  el = document.getElementById("3");
+  el.addEventListener("click", () => alert('click me last'));
+  el = document.getElementById("scroll");
+  for (let i = 0; i !== 1000; ++i) data += `<br> line ${i} \n`;
+  el.innerHTML = data;
+  // document.addEventListener('scroll', (event) => console.log('scroll:', window.scrollY, event.target));
+  // document.body.onscroll = (event) => console.log('scroll:', window.scrollY, event.target);
+</script>
+
+</html>
