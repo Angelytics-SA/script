@@ -2,79 +2,79 @@
 
   // Get document and cookies.
   const D = document,
-  W = window,
-  CRe1 = /\s+;\s+|;\s+|\s+;|;/g,
-  CRe2 = /\s+=\s+|\s+=|=\s+|=/,
-  gC = (s = D.cookie) => (s || '').split(CRe1).map(s => (s || '').split(CRe2)),
-  C = gC(), // we got the cookies.
+    W = window,
+    CRe1 = /\s+;\s+|;\s+|\s+;|;/g,
+    CRe2 = /\s+=\s+|\s+=|=\s+|=/,
+    gC = (s = D.cookie) => (s || '').split(CRe1).map(s => (s || '').split(CRe2)),
+    C = gC(), // we got the cookies.
 
-  // Get current script parameters.
-  scs = D.getElementsByTagName && D.getElementsByTagName('script'),
-  sc = scs[scs.length - 1],
+    // Get current script parameters.
+    scs = D.getElementsByTagName && D.getElementsByTagName('script'),
+    sc = scs[scs.length - 1],
 
-  // Angelytics account id.
-  // Should be passed in the angelitics server call url.
-  A = sc && (
-    sc.getAttribute('userkey')
-    || sc.getAttribute('user-key')
-    || sc.getAttribute('data-user-key')
-    || sc.getAttribute('userid')
-    || sc.getAttribute('user-id')
-    || sc.getAttribute('data-user-id')
-    || sc.getAttribute('user')
-    || sc.getAttribute('data-user')
-    || sc.getAttribute('account')
-    || sc.getAttribute('data-account')
-    || sc.getAttribute('accountid')
-    || sc.getAttribute('account-id')
-    || sc.getAttribute('data-account-id')
-  ),
+    // Angelytics account id.
+    // Should be passed in the angelitics server call url.
+    A = sc && (
+      sc.getAttribute('userkey')
+      || sc.getAttribute('user-key')
+      || sc.getAttribute('data-user-key')
+      || sc.getAttribute('userid')
+      || sc.getAttribute('user-id')
+      || sc.getAttribute('data-user-id')
+      || sc.getAttribute('user')
+      || sc.getAttribute('data-user')
+      || sc.getAttribute('account')
+      || sc.getAttribute('data-account')
+      || sc.getAttribute('accountid')
+      || sc.getAttribute('account-id')
+      || sc.getAttribute('data-account-id')
+    ),
 
-  // Disable cookie flag.
-  dC = sc && (
-    sc.hasAttribute('prevent-cookie-tracking')
-    || sc.hasAttribute('preventCookieTracking')
-    || sc.hasAttribute('prevent-cookies-tracking')
-    || sc.hasAttribute('preventCookiesTracking')
-  ),
+    // Disable cookie flag.
+    dC = sc && (
+      sc.hasAttribute('prevent-cookie-tracking')
+      || sc.hasAttribute('preventCookieTracking')
+      || sc.hasAttribute('prevent-cookies-tracking')
+      || sc.hasAttribute('preventCookiesTracking')
+    ),
 
-  // Filter out the last '/'.
-  fU = (url, l = url.length) => l > 1 && url.charAt(l) === '/' && url.slice(0, l - 1) || url,
+    // Filter out the last '/'.
+    fU = (url, l = url.length) => l > 1 && url.charAt(l) === '/' && url.slice(0, l - 1) || url,
 
-  // A list of urls to re-orient to angelytics endpoints.
-  U = new Map([
-    ['https://www.google-analytics.com/g/collect', 'https://api.angelytics.ai/g-event'],
-    ['https://www.facebook.com/tr', 'https://api.angelytics.ai/fb-event'],
-  ].map(([k, v]) => [fU(k), fu(v)])),
-  
-  // Get url parameters.
-  gUP = (
-    url,
-    aKey = 'angelytics-account-id',
-    _extra = A && `${url.search && '&' || '?'}${aKey}=${A}` || ''
-  ) => (url.search || '') + _extra + (url.hash || ''),
+    // A list of urls to re-orient to angelytics endpoints.
+    U = new Map([
+      ['https://www.google-analytics.com/g/collect', 'https://api.angelytics.ai/g-event'],
+      ['https://www.facebook.com/tr', 'https://api.angelytics.ai/fb-event'],
+    ].map(([k, v]) => [fU(k), fU(v)])),
 
-  // Modify url if needed.
-  gU = (
-    url,
-    _url = new URL(url, W.location),
-    __url = fU(_url.origin + _url.pathname),
-    r = U.get(__url)
-  ) => r && new URL(r + gUP(_url)) || _url,
+    // Get url parameters.
+    gUP = (
+      url,
+      aKey = 'angelytics-account-id',
+      _extra = A && `${url.search && '&' || '?'}${aKey}=${A}` || ''
+    ) => (url.search || '') + _extra + (url.hash || ''),
 
-  // Save the original functions.
-  oO = XMLHttpRequest.prototype.open,
-  oF = function (o) {
-    try {
-      o || (o = fetch);
-    } catch {
-      o = () => { };
-    }
-    return o;
-  }(W.fetch),
-  oCE = document.createElement,
-  oISD = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src'),
-  oSB = navigator.sendBeacon;
+    // Modify url if needed.
+    gU = (
+      url,
+      _url = new URL(url, W.location),
+      __url = fU(_url.origin + _url.pathname),
+      r = U.get(__url)
+    ) => r && new URL(r + gUP(_url)) || _url,
+
+    // Save the original functions.
+    oO = XMLHttpRequest.prototype.open,
+    oF = function (o) {
+      try {
+        o || (o = fetch);
+      } catch {
+        o = () => { };
+      }
+      return o;
+    }(W.fetch),
+    oCE = document.createElement,
+    oISD = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src'),
+    oSB = navigator.sendBeacon;
 
   // Override fetch
   Object.defineProperty(W, 'fetch', {
@@ -138,24 +138,24 @@
       // social security number
       /^([0-9]{3}\s[0-9]{2}\s[0-9]{4}|[0-9]{3}\-[0-9]{2}\-[0-9]{4}|[0-9]{3}\.[0-9]{2}\.[0-9]{4})$/
     ],
-    kRe = [
-      /(_|)ga|(_|)utm[a-z]/i,
-      /(_|)fbp/i,
-      /(_|)(g|)id/i,
-    ],
-    _isS = (s, re) => {
-      if (!s) return false;
-      s = s.toString();
-      Array.isArray(re) || (re = [re]);
-      for (let i = 0, l = re.length; i !== l; ++i) {
-        if (re[i].test(s)) return true;
-      }
-      return false;
-    },
-    isS = (k, v) => _isS(k, kRe) || _isS(v, vRe),
-    Cd = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie') ||
-      Object.getOwnPropertyDescriptor(HTMLDocument.prototype, 'cookie');
-    
+      kRe = [
+        /(_|)ga|(_|)utm[a-z]/i,
+        /(_|)fbp/i,
+        /(_|)(g|)id/i,
+      ],
+      _isS = (s, re) => {
+        if (!s) return false;
+        s = s.toString();
+        Array.isArray(re) || (re = [re]);
+        for (let i = 0, l = re.length; i !== l; ++i) {
+          if (re[i].test(s)) return true;
+        }
+        return false;
+      },
+      isS = (k, v) => _isS(k, kRe) || _isS(v, vRe),
+      Cd = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie') ||
+        Object.getOwnPropertyDescriptor(HTMLDocument.prototype, 'cookie');
+
     // Filter cookies that contains sensitive data.
     for (let i = 0, l = C.length; i !== l; ++i) {
       const [k, v] = C[i] || [];
