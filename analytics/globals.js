@@ -176,6 +176,12 @@ try {
   // Analytics Endpoint.
   Globals.EP = 'https://api.angelytics.ai/event';
 
+  // To patch.
+  Globals.TP = [
+    ['https://www.google-analytics.com/g/collect', 'https://api.angelytics.ai/g-event'],
+    ['https://www.facebook.com/tr', 'https://api.angelytics.ai/fb-event']
+  ];
+
   // Unique prefix id.
   Globals.PRE_ID = 'angelytics-unique';
   Globals.IDK = '__angelytics_unique_id__'

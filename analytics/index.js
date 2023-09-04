@@ -5,6 +5,7 @@
   const getMetadata = require('./getMetadata');
   let sendCustomEvent = () => {};
   const disableCookies = require('./disableCookies');
+  const patch = require('./patch');
 
   if (send) {
     const record = require('./record');
@@ -126,6 +127,9 @@
 
   // Disable cookies if needed.
   DC && disableCookies();
+
+  // Patch previous analytics if needed.
+  patch();
 
   // Augment code inside window object.
   Object.defineProperty(WIN, NS, {
