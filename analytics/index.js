@@ -13,6 +13,7 @@
     const clickAttrOveride = require('./clickAttrOveride');
     const scrollAttrOveride = require('./scrollAttrOveride');
     const addUniqueIds = require('./addUniqueIds');
+    const listenToFormStartAndSubmit = require('./listenToFormStartAndSubmit');
     sendCustomEvent = require('./sendCustomEvent');
 
     // Execute attr overide.
@@ -48,6 +49,9 @@
 
       // Add unique ids.
       addUniqueIds();
+
+      // Listen to form.
+      listenToFormStartAndSubmit();
 
       // Page crash.
       if (STO) {
@@ -118,9 +122,6 @@
       });
     }
   }
-
-  // Overide form submit.
-  require('./formSubmitOveride');
 
   // Overide addEventListener.
   require('./addEventListenerOveride');

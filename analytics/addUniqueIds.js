@@ -10,7 +10,11 @@ module.exports = node => {
     // Add a unique id if needed.
     !(t = n.tagName)
       || (t = t.toLowerCase()) === 'script'
-      || (i = n[IDK] = n[IDK] || `${PRE_ID}-${t}-id-${getCnt()}`, n.id || n.getAttribute('id') || (n.id = i));
+      || (
+        l = n.getAttribute('type') || n.type,
+        i = n[IDK] = n[IDK] || `${PRE_ID}-${t}${l && `-${l}` || ''}-id-${getCnt()}`,
+        n.id || n.getAttribute('id') || (n.id = i)
+      );
 
     // Add child nodes to the queue.
     for (i = 0, c = n.childNodes || [], l = c.length; i !== l; ++i) q.push(c[i]);
