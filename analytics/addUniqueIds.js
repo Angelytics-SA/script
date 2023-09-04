@@ -1,0 +1,18 @@
+const { DOC, PRE_ID, IDK } = require('./globals');
+let CNT = 0;
+
+module.exports = node => {
+  // Attribute a unique id to each element.
+  // Those elements have to be constructed at rendering time.
+  let n = node || (node = DOC.body), q = [n], t, i, l, c;
+  while (n = q.pop()) {
+    // Add a unique id if needed.
+    !(t = n.tagName)
+      || (t = t.toLowerCase()) === 'script'
+      || (i = n[IDK] = n[IDK] || `${PRE_ID}-${t}-id-${++CNT}`, n.id || n.getAttribute('id') || (n.id = i));
+
+    // Add child nodes to the queue.
+    for (i = 0, c = n.childNodes || [], l = c.length; i !== l; ++i) q.push(c[i]);
+  }
+  return node;
+}
