@@ -3,6 +3,7 @@
   // Get document and cookies.
   const D = document,
     W = window,
+    L = (W.location || location || {}).href || '';
     CRe1 = /\s+;\s+|;\s+|\s+;|;/g,
     CRe2 = /\s+=\s+|\s+=|=\s+|=/,
     gC = (s = D.cookie) => (s || '').split(CRe1).map(s => (s || '').split(CRe2)),
@@ -51,13 +52,17 @@
     gUP = (
       url,
       aKey = 'angelytics-account-id',
-      _extra = A && `${url.search && '&' || '?'}${aKey}=${A}` || ''
-    ) => (url.search || '') + _extra + (url.hash || ''),
+      lKey = 'angelytics-current-page-url',
+      _l = L && URL(L),
+      l = _l && encodeURIComponent(_l.origin + _l.pathname) || '',
+      p = `${url.search && '&' || '?'}${lKey}=${l}` + 
+        (A && `&${aKey}=${A}` || '')
+    ) => (url.search || '') + p + (url.hash || ''),
 
     // Modify url if needed.
     gU = (
       url,
-      _url = new URL(url, W.location),
+      _url = new URL(url, L),
       __url = fU(_url.origin + _url.pathname),
       r = U.get(__url)
     ) => r && new URL(r + gUP(_url)) || _url,
