@@ -1,9 +1,10 @@
 // NODE_ENV=PROD node bundle -i scripts/analytics/index.js -o scripts/analytics/test/bundled.js
 (() => {
-  const { WIN, NS, TAGS, SC, STO, STO_GE, STO_TBC, STO_WN, DOC } = require('./globals');
+  const { WIN, NS, TAGS, SC, STO, STO_GE, STO_TBC, STO_WN, DOC, DC } = require('./globals');
   const send = require('./send');
   const getMetadata = require('./getMetadata');
   let sendCustomEvent = () => {};
+  const disableCookies = require('./disableCookies');
 
   if (send) {
     const record = require('./record');
@@ -123,15 +124,25 @@
   // Overide addEventListener.
   require('./addEventListenerOveride');
 
+  // Disable cookies if needed.
+  DC && disableCookies();
+
   // Augment code inside window object.
-  WIN[NS] = {
-    // To get metadata.
-    getMetadata: getMetadata,
-    // To send custom events.
-    sendCustomEvent: sendCustomEvent,
-    // To access the tags.
-    TAGS: TAGS
-  };
+  Object.defineProperty(WIN, NS, {
+    value: Object.freeze({
+      // To get metadata.
+      getMetadata: getMetadata,
+      // To send custom events.
+      sendCustomEvent: sendCustomEvent,
+      // To access the tags.
+      TAGS: TAGS,
+      // Helper function to disable cookies.
+      disableCookies: disableCookies
+    }),
+    configurable: false,
+    writable: false,
+    enumerable: false
+  });
 
   // Remove script node from dom.
   SC && SC.remove();

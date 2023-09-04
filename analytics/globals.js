@@ -67,6 +67,14 @@ try {
     || SC.getAttribute('data-account-id')
   ) || undefined;
 
+  // Disable cookie flag.
+  Globals.DC = SC && (
+    SC.hasAttribute('disable-cookie')
+    || SC.hasAttribute('disableCookie')
+    || SC.hasAttribute('disable-cookies')
+    || SC.hasAttribute('disableCookies')
+  );
+
   // Namespace to operate in.
   Globals.NS = SC && SC.getAttribute('namespace') || 'angelytics';
 
