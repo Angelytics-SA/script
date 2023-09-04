@@ -1,4 +1,4 @@
-const { DOC, NAV, BRO, REN, WST, MOB, TS, LOC, TZO, SID } = require('./globals');
+const { DOC, NAV, BRO, REN, WST, MOB, TS, LOC, TZO, SID, IDK } = require('./globals');
 const getElementBox = require('./getElementBox');
 
 // Helper function to get the metadata.
@@ -36,11 +36,13 @@ module.exports = elmt => {
       src = elmt.getAttribute('src') || elmt.src
         || elmt.getAttribute('href') || elmt.href
         || elmt.getAttribute('action') || elmt.action,
-      type = elmt.getAttribute('type') || elmt.type;
+      type = elmt.getAttribute('type') || elmt.type,
+      uid = elmt.getAttribute(IDK) || elmt[IDK];
     id && (el.identifier = id);
     src && (el.source = src);
     el.tagName = elmt.tagName.toLowerCase();
     type && (el.type = elmt.type);
+    uid && (el.uniqueIdentifier = uid);
   }
   return data;
 }

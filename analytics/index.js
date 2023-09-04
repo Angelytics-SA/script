@@ -10,6 +10,7 @@
     const getWindowName = require('./getWindowName');
     const clickAttrOveride = require('./clickAttrOveride');
     const scrollAttrOveride = require('./scrollAttrOveride');
+    const addUniqueIds = require('./addUniqueIds');
     sendCustomEvent = require('./sendCustomEvent');
 
     // Execute attr overide.
@@ -42,6 +43,9 @@
     const changed = new Set;
     const onload = () => {
       executeAttrOveride(DOC.body, changed);
+
+      // Add unique ids.
+      addUniqueIds();
 
       // Page crash.
       if (STO) {

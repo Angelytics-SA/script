@@ -167,6 +167,10 @@ try {
 
   // Analytics Endpoint.
   Globals.EP = 'https://api.angelytics.ai/event';
+
+  // Unique prefix id.
+  Globals.PRE_ID = 'angelytics-unique';
+  Globals.IDK = '__angelytics_unique_id__'
   
   Globals.CLIENT = true;
 } catch {
