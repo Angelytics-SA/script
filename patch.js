@@ -32,10 +32,10 @@
 
     // Disable cookie flag.
     dC = sc && (
-      sc.hasAttribute('prevent-cookie-tracking')
-      || sc.hasAttribute('preventCookieTracking')
-      || sc.hasAttribute('prevent-cookies-tracking')
-      || sc.hasAttribute('preventCookiesTracking')
+      sc.hasAttribute('disable-cookie')
+      || sc.hasAttribute('disableCookie')
+      || sc.hasAttribute('disable-cookies')
+      || sc.hasAttribute('disableCookies')
     ),
 
     // Filter out the last '/'.
@@ -123,55 +123,23 @@
 
   // If disable cookie flag is there.
   if (dC) {
-    // Regular expressions for filtering client side
-    const vRe = [
-      // email checker
-      /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/i,
-      // ip v4 checker
-      /^(?!.*\.$)((?!0\d)(1?\d?\d|25[0-5]|2[0-4]\d)(\.|$)){4}$/,
-      // ip v6 checker
-      /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/gi,
-      // mac address
-      /\b([0-9A-F]{2}[:-]){5}([0-9A-F]){2}\b/i,
-      // phone number
-      /^(\+[0-9]{1,4}(\s[\.\-]\s|[\.\-]|\s|)|)(\((\s|)|)([0-9]{10}|[0-9]{5}(\s\)|\)|)(\s[\.\-]\s|[\.\-]|\s)[0-9]{5}|[0-9]{3}(\s\)|\)|)(\s[\.\-]\s|[\.\-]|\s)[0-9]{3}(\s[\.\-]\s|[\.\-]|\s)[0-9]{4}|[0-9]{2}(\s\)|\)|)(\s[\.\-]\s|[\.\-]|\s)[0-9]{2}(\s[\.\-]\s|[\.\-]|\s)[0-9]{2}(\s[\.\-]\s|[\.\-]|\s)[0-9]{2}(\s[\.\-]\s|[\.\-]|\s)[0-9]{2})$/,
-      // social security number
-      /^([0-9]{3}\s[0-9]{2}\s[0-9]{4}|[0-9]{3}\-[0-9]{2}\-[0-9]{4}|[0-9]{3}\.[0-9]{2}\.[0-9]{4})$/
-    ],
-      kRe = [
-        /(_|)ga|(_|)utm[a-z]/i,
-        /(_|)fbp/i,
-        /(_|)(g|)id/i,
-      ],
-      _isS = (s, re) => {
-        if (!s) return false;
-        s = s.toString();
-        Array.isArray(re) || (re = [re]);
-        for (let i = 0, l = re.length; i !== l; ++i) {
-          if (re[i].test(s)) return true;
-        }
-        return false;
-      },
-      isS = (k, v) => _isS(k, kRe) || _isS(v, vRe),
-      Cd = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie') ||
-        Object.getOwnPropertyDescriptor(HTMLDocument.prototype, 'cookie');
+    const Cd = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie') ||
+      Object.getOwnPropertyDescriptor(HTMLDocument.prototype, 'cookie');
 
-    // Filter cookies that contains sensitive data.
+    // Disable cookies.
     for (let i = 0, l = C.length; i !== l; ++i) {
-      const [k, v] = C[i] || [];
-      isS(k, v) && (D.cookie = `${k}=; expires=${new Date(Date.now() - 120000).toUTCString()}; max-age=-99999999`);
+      const [k, _] = C[i] || [];
+      k && (D.cookie = `${k}=; expires=${new Date(Date.now() - 120000).toUTCString()}; max-age=-99999999`);
     }
 
-    // Prevent the creation of new sensitive cookies.
+    // Prevent the creation of new cookie.
     if (Cd && Cd.configurable) {
       Object.defineProperty(D, 'cookie', {
         get: function () {
           return Cd.get.call(D);
         },
         set: function (val) {
-          let c = gC(val), s = false, i = 0, l = c.length;
-          for (; i !== l && !s; ++i) s = isS(...c[i]);
-          s || Cd.set.call(D, val);
+          // Does nothing but returning the value.
           return val;
         }
       });
