@@ -40,33 +40,21 @@ module.exports = CB && typeof WIN[CB] === 'function' && afy((...data) => WIN[CB]
     }
 
     // Use sendBeacon if possible.
-    if (NAV.sendBeacon) {
-      const queued = navigator.sendBeacon(uri, data);
+    try {
+      const queued = NAV.sendBeacon(uri, data);
       return queued && Promise.resolve(queued) || Promise.reject('analytics not queued');
-    }
-
-    // Send data using the traditional fetch.
-    return fetch(uri, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      keepalive: true,
-      credentials: 'include',
-      body: data
-    })
-      .then(response => response.json())
-      .then(result => {
-        // Handle the response
-        // console.log(result);
-        // console.log('Recorded', data);
-        return result;
-      })
-      .catch(error => {
-        // Handle the error
-        // @Tristan: is it the best way to handle the error?
-        console.error(error);
-        return Promise.reject(error);
+    } catch {
+      // Send data using the traditional fetch.
+      return fetch(uri, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        keepalive: true,
+        credentials: 'include',
+        mode: 'no-cors',
+        body: data
       });
+    }
   })
 );
