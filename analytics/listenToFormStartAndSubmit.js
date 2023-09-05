@@ -21,7 +21,7 @@ module.exports = (
   for (let i = 0, l = forms.length, f, id, onchange, onsubmit; i !== l; ++i) {
     f = forms[i];
     id = f[IDK];
-    if (id && set && set.has(id)) continue;
+    if (id && set && set.has(id) || (f.tagName || '').toLowerCase() !== 'form') continue;
     id && set && set.add(id);
     onsubmit = () => {
       record({

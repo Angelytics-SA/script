@@ -14,6 +14,7 @@
     const scrollAttrOveride = require('./scrollAttrOveride');
     const addUniqueIds = require('./addUniqueIds');
     const listenToFormStartAndSubmit = require('./listenToFormStartAndSubmit');
+    const addEventListenerDomNodeInserted = require('./addEventListenerDomNodeInserted');
     sendCustomEvent = require('./sendCustomEvent');
 
     // Execute attr overide.
@@ -52,6 +53,17 @@
 
       // Listen to form.
       listenToFormStartAndSubmit();
+
+      // Add listener for new nodes.
+      addEventListenerDomNodeInserted(
+        DOC.body,
+        addUniqueIds,
+        executeAttrOveride,
+        node => listenToFormStartAndSubmit(
+          (node.tagName || '').toLowerCase() === 'form' && node
+          || (node.getElementsByTagName && (node.getElementsByTagName('form') || []))
+        )
+      );
 
       // Page crash.
       if (STO) {
