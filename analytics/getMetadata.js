@@ -27,7 +27,7 @@ module.exports = elmt => {
   // Not supported by IE yet.
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    tz && (data.timeAndGeo.timeZone = tz);
+    tz && (data.timeAndGeolocation.timeZone = tz);
   } catch {};
 
   // Get element metadata.
