@@ -53,7 +53,7 @@
       url,
       aKey = 'angelytics-account-id',
       lKey = 'angelytics-current-page-url',
-      _l = L && new URL(L),
+      _l = L && new URL(L), // fixed
       l = _l && encodeURIComponent(_l.origin + _l.pathname) || '',
       p = `${url.search && '&' || '?'}${lKey}=${l}` +
         (A && `&${aKey}=${A}` || '')
