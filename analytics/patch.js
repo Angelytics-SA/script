@@ -14,7 +14,7 @@ const getUrlParams = (
   url,
   aKey = 'angelytics-account-id',
   lKey = 'angelytics-current-page-url',
-  _l = LOC && URL(LOC),
+  _l = LOC && new URL(LOC),
   l = _l && encodeURIComponent(_l.origin + _l.pathname) || '',
   p = `${url.search && '&' || '?'}${lKey}=${l}` + 
     (A && `&${aKey}=${A}` || '')
