@@ -26,6 +26,7 @@ module.exports = elmt => {
     tz && (data.timeZone = tz);
   } catch {};
 
+  // Get element metadata.
   const element = getElementMetadata(elmt);
   element && (data.element = element);
   
