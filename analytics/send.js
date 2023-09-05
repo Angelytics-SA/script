@@ -1,4 +1,4 @@
-const { WIN, A, CB, EP, EK } = require('./globals');
+const { WIN, NAV, A, CB, EP, EK } = require('./globals');
 const ec = require('./eecClientEncrypt');
 const afy = require('./asyncify');
 
@@ -39,12 +39,20 @@ module.exports = CB && typeof WIN[CB] === 'function' && afy((...data) => WIN[CB]
       return Promise.reject(error);
     }
 
-    // Send data.
+    // Use sendBeacon if possible.
+    if (NAV.sendBeacon) {
+      const queued = navigator.sendBeacon(uri, data);
+      return queued && Promise.resolve(queued) || Promise.reject('analytics not queued');
+    }
+
+    // Send data using the traditional fetch.
     return fetch(uri, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      keepalive: true,
+      credentials: 'include',
       body: data
     })
       .then(response => response.json())
