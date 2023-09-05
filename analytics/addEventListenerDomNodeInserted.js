@@ -7,7 +7,7 @@ const createCallback = callbacks => mutationList => {
     if ((m = mutationList[i]).type !== 'childList') continue;
     for (let j = 0, a = m.addedNodes, al = a.length || a.size || 0; j !== al; ++j) {
       for (let k = 0, cn = a[j]; k !== cl; ++k) {
-        callbacks[i](cn);
+        callbacks[k](cn);
       }
     }
   }

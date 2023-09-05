@@ -1,6 +1,6 @@
 // NODE_ENV=PROD node bundle -i scripts/analytics/index.js -o scripts/analytics/test/bundled.js
 (() => {
-  const { WIN, NS, TAGS, SC, STO, STO_GE, STO_TBC, STO_WN, DOC, DC } = require('./globals');
+  const { WIN, NS, TAGS, SC, STO, STO_GE, STO_TBC, STO_WN, DOC, DC, IDK } = require('./globals');
   const send = require('./send');
   const getMetadata = require('./getMetadata');
   let sendCustomEvent = () => {};
@@ -26,7 +26,7 @@
         for (i = 0, cn = node.childNodes || [], l = cn.length; i !== l; ++i) queue.push(cn[i]);
 
         // Change node only if needed.
-        if (changedSet && changedSet.has(node)) continue;
+        if (changedSet && changedSet.has(node[IDK])) continue;
 
         // Check if node is attached an onclick attribute.
         tn = (node.tagName || '').toLowerCase();
@@ -39,17 +39,20 @@
           scrollAttrOveride(node);
         }
 
-        changedSet && changedSet.add(node);
+        // Register node if needed.
+        changedSet && changedSet.add(node[IDK]);
       }
     }
 
     // On load event handler.
     const changed = new Set;
     const onload = () => {
-      executeAttrOveride(DOC.body, changed);
 
       // Add unique ids.
       addUniqueIds();
+
+      // Overide click events.
+      executeAttrOveride(DOC.body, changed);
 
       // Listen to form.
       listenToFormStartAndSubmit();
@@ -58,7 +61,7 @@
       addEventListenerDomNodeInserted(
         DOC.body,
         addUniqueIds,
-        executeAttrOveride,
+        node => executeAttrOveride(node, changed),
         node => listenToFormStartAndSubmit(
           (node.tagName || '').toLowerCase() === 'form' && node
           || (node.getElementsByTagName && (node.getElementsByTagName('form') || []))
