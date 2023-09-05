@@ -36,12 +36,13 @@ module.exports = elmt => {
       src = elmt.getAttribute('src') || elmt.src
         || elmt.getAttribute('href') || elmt.href
         || elmt.getAttribute('action') || elmt.action,
+      tn = (elmt.tagName || '').toLowerCase(),
       type = elmt.getAttribute('type') || elmt.type,
       uid = elmt.getAttribute(IDK) || elmt[IDK];
     id && (el.identifier = id);
     src && (el.source = src);
-    el.tagName = elmt.tagName.toLowerCase();
-    type && (el.type = elmt.type);
+    tn && (el.tagName = tn);
+    type && (el.type = type);
     uid && (el.uniqueIdentifier = uid);
   }
   return data;
