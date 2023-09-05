@@ -15,8 +15,10 @@ module.exports = elmt => {
     page: {
       location: LOC
     },
-    date: Date.now(),
-    timeZoneOffset: TZO,
+    timeAndGeolocation: {
+      date: Date.now(),
+      timeZoneOffset: TZO,
+    },
     sessionId: SID
   };
   DOC.title && (data.page.title = DOC.title);
@@ -25,7 +27,7 @@ module.exports = elmt => {
   // Not supported by IE yet.
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    tz && (data.timeZone = tz);
+    tz && (data.timeAndGeo.timeZone = tz);
   } catch {};
 
   // Get element metadata.
