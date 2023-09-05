@@ -4,7 +4,7 @@
   const D = document,
     W = window,
     L = (W.location || location || {}).href || '';
-    CRe1 = /\s+;\s+|;\s+|\s+;|;/g,
+  CRe1 = /\s+;\s+|;\s+|\s+;|;/g,
     CRe2 = /\s+=\s+|\s+=|=\s+|=/,
     gC = (s = D.cookie) => (s || '').split(CRe1).map(s => (s || '').split(CRe2)),
     C = gC(), // we got the cookies.
@@ -53,9 +53,9 @@
       url,
       aKey = 'angelytics-account-id',
       lKey = 'angelytics-current-page-url',
-      _l = L && URL(L),
+      _l = L && new URL(L),
       l = _l && encodeURIComponent(_l.origin + _l.pathname) || '',
-      p = `${url.search && '&' || '?'}${lKey}=${l}` + 
+      p = `${url.search && '&' || '?'}${lKey}=${l}` +
         (A && `&${aKey}=${A}` || '')
     ) => (url.search || '') + p + (url.hash || ''),
 
