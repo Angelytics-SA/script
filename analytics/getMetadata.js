@@ -12,13 +12,15 @@ module.exports = elmt => {
       hasTouchScreen: TS,
       language: NAV.language
     },
-    location: LOC,
+    page: {
+      location: LOC
+    },
     date: Date.now(),
     timeZoneOffset: TZO,
-    sessionId: SID,
-    title: DOC.title
+    sessionId: SID
   };
-  DOC.referrer && (data.referrer = DOC.referrer.toString());
+  DOC.title && (data.page.title = DOC.title);
+  DOC.referrer && (data.page.referrer = DOC.referrer.toString());
 
   // Not supported by IE yet.
   try {
