@@ -6,6 +6,7 @@
   let sendCustomEvent = () => {};
   const disableCookies = require('./disableCookies');
   const patch = require('./patch');
+  require('./preventScriptLoading')('other', null);
 
   if (send) {
     const record = require('./record');

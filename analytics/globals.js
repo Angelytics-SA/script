@@ -71,12 +71,54 @@ try {
   Globals.DC = SC && (
     SC.hasAttribute('disable-cookie')
     || SC.hasAttribute('disableCookie')
+    || SC.hasAttribute('data-disable-cookie')
     || SC.hasAttribute('disable-cookies')
     || SC.hasAttribute('disableCookies')
+    || SC.hasAttribute('data-disable-cookies')
   );
 
   // Namespace to operate in.
-  Globals.NS = SC && SC.getAttribute('namespace') || 'angelytics';
+  Globals.NS = SC && SC.getAttribute('') || 'angelytics';
+
+  // List of GA id to patch.
+  Globals.GA = SC && new Set(
+    SC.getAttribute('ga')
+    || SC.getAttribute('data-ga')
+    || SC.getAttribute('gtm')
+    || SC.getAttribute('data-gtm')
+    || SC.getAttribute('google-analytics-id')
+    || SC.getAttribute('data-google-analytics-id')
+    || SC.getAttribute('google-analytics-ids')
+    || SC.getAttribute('data-google-analytics-ids')
+    || SC.getAttribute('google-tag-manager-id')
+    || SC.getAttribute('data-google-tag-manager-id')
+    || SC.getAttribute('google-tag-manager-ids')
+    || SC.getAttribute('data-google-tag-manager-ids')
+    || SC.getAttribute('tag-manager-id')
+    || SC.getAttribute('data-tag-manager-id')
+    || SC.getAttribute('tag-manager-ids')
+    || SC.getAttribute('data-tag-manager-ids')
+    || ''
+  ).trim().split(/\s+/g);
+
+  // List of Pixel ids
+  Globals.MP = SC && new Set(
+    SC.getAttribute('mp')
+    || SC.getAttribute('data-mp')
+    || SC.getAttribute('fbq')
+    || SC.getAttribute('data-fbq')
+    || SC.getAttribute('pixel')
+    || SC.getAttribute('data-pixel')
+    || SC.getAttribute('pixel-id')
+    || SC.getAttribute('data-pixel-id')
+    || SC.getAttribute('pixel-ids')
+    || SC.getAttribute('data-pixel-ids')
+    || SC.getAttribute('meta-pixel-id')
+    || SC.getAttribute('data-meta-pixel-id')
+    || SC.getAttribute('meta-pixel-ids')
+    || SC.getAttribute('data-meta-pixel-ids')
+    || ''
+  ).trim().split(/\s+/g);
 
   // Provided callback for analytics.
   Globals.CB = SC && (
@@ -180,6 +222,16 @@ try {
   Globals.TP = [
     ['https://www.google-analytics.com/g/collect', 'https://api.angelytics.ai/g-event'],
     ['https://www.facebook.com/tr', 'https://api.angelytics.ai/fb-event']
+  ];
+
+  // Script source to prevent loading.
+  Globals.DSS = [
+    'googletagmanager.com/gtag'
+  ];
+
+  // Script content to prevent loading.
+  Globals.DSC = [
+    'window.dataLayer'
   ];
 
   // Unique prefix id.
