@@ -4,7 +4,11 @@ const { WIN, DOC, NAV, LOC, A, TP } = require('./globals');
 const normalizeUrl = (url, l = url.length) => l > 1 && url.charAt(l) === '/' && url.slice(0, l - 1) || url;
 
 // Normalize urls to patch.
-const normalizeUrlMap = map => new Map(Array.from(map).map(([k, v]) => [normalizeUrl(k), normalizeUrl(v)]));
+const normalizeUrlMap = map => new Map(
+  Array.from(map || []).map(
+    ([k, v]) => [normalizeUrl(k), normalizeUrl(v)]
+  )
+);
 
 // Urls to patch.
 const TO_PATCH = normalizeUrlMap(TP);

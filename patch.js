@@ -3,8 +3,8 @@
   // Get document and cookies.
   const D = document,
     W = window,
-    L = (W.location || location || {}).href || '';
-  CRe1 = /\s+;\s+|;\s+|\s+;|;/g,
+    L = (W.location || location || {}).href || '',
+    CRe1 = /\s+;\s+|;\s+|\s+;|;/g,
     CRe2 = /\s+=\s+|\s+=|=\s+|=/,
     gC = (s = D.cookie) => (s || '').split(CRe1).map(s => (s || '').split(CRe2)),
     C = gC(), // we got the cookies.

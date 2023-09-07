@@ -1,6 +1,7 @@
-const { WIN, NAV, A, CB, EP, EK } = require('./globals');
+const { DOC, WIN, NAV, A, CB, EP, EK, OA, C, DC } = require('./globals');
 const ec = require('./eecClientEncrypt');
 const afy = require('./asyncify');
+const getCookies = require('./getCookies');
 
 // Function to send data to servers.
 module.exports = CB && typeof WIN[CB] === 'function' && afy((...data) => WIN[CB].apply(WIN, data))
@@ -11,16 +12,25 @@ module.exports = CB && typeof WIN[CB] === 'function' && afy((...data) => WIN[CB]
     uri = EP, // where to send it
     _ek = encryptionKey && typeof encryptionKey !== 'string' && EK || encryptionKey
   ) => {
+    // Add more private data.
+    A && (data.ids.account = A);
+    const otherAnalyticsIds = {};
+    let k, v, f;
+    for (k in OA) (v = OA[k]) && (v.length || v.size) && (otherAnalyticsIds[k] = Array.from(v), f = true);
+    f && (data.ids.otherAnalytics = otherAnalyticsIds);
+    const cookies = getCookies(`${C && C + ';' || ''}${DOC.cookie}`);
+    cookies && Object.keys(cookies).length && (
+      data.cookies = cookies,
+      DC && (data.disableCookies = DC)
+    );
+
     // Encrypt the data if needed.
-    data = {
-      accountId: A,
-      ...data,
-    };
     if (_ek) {
       try {
-        data.userId && (data.userId = ec(data.userId, _ek));
-        data.body && (data.body = ec(data.body, _ek));
-        data.flag = 1;
+        data.ids.user && (data.ids.user = ec(data.event.ids.user, _ek));
+        data.event.body && (data.event.body = ec(data.event.body, _ek));
+        data.element.identifier && (data.element.identifier = ec(data.element.identifier, _ek));
+        data.encrypted = ['ids.user', 'event.body', 'element.identifier'];
       } catch (error) {
         // Could not encrypt the message.
         // It can happen with a probability of 1 / (2^256)
@@ -40,6 +50,7 @@ module.exports = CB && typeof WIN[CB] === 'function' && afy((...data) => WIN[CB]
     }
 
     // Use sendBeacon if possible.
+
     try {
       const queued = NAV.sendBeacon(uri, data);
       return queued && Promise.resolve(queued) || Promise.reject('analytics not queued');

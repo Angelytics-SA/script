@@ -4,10 +4,9 @@ const getCookies = require('./getCookies');
 const Cd = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie') ||
   Object.getOwnPropertyDescriptor(HTMLDocument.prototype, 'cookie');
 
-module.exports = (doc = DOC, C = getCookies(doc)) => {
+module.exports = (doc = DOC, C = getCookies(doc) || {}) => {
   // Disable cookies.
-  for (let i = 0, l = C.length; i !== l; ++i) {
-    const [k, _] = C[i] || [];
+  for (const k in C) {
     k && (doc.cookie = `${k}=; expires=${new Date(Date.now() - 120000).toUTCString()}; max-age=-99999999`);
   }
 

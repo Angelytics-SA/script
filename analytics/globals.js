@@ -77,11 +77,14 @@ try {
     || SC.hasAttribute('data-disable-cookies')
   );
 
+  Globals.C = DOC.cookie;
+
   // Namespace to operate in.
   Globals.NS = SC && SC.getAttribute('') || 'angelytics';
 
   // List of GA id to patch.
-  Globals.GA = SC && new Set(
+  Globals.OA = {};
+  Globals.OA.ga = SC && new Set((
     SC.getAttribute('ga')
     || SC.getAttribute('data-ga')
     || SC.getAttribute('gtm')
@@ -99,10 +102,10 @@ try {
     || SC.getAttribute('tag-manager-ids')
     || SC.getAttribute('data-tag-manager-ids')
     || ''
-  ).trim().split(/\s+/g);
+  ).trim().split(/\s+/g).filter(x => x));
 
   // List of Pixel ids
-  Globals.MP = SC && new Set(
+  Globals.OA.fbq = SC && new Set((
     SC.getAttribute('mp')
     || SC.getAttribute('data-mp')
     || SC.getAttribute('fbq')
@@ -118,7 +121,7 @@ try {
     || SC.getAttribute('meta-pixel-ids')
     || SC.getAttribute('data-meta-pixel-ids')
     || ''
-  ).trim().split(/\s+/g);
+  ).trim().split(/\s+/g).filter(x => x));
 
   // Provided callback for analytics.
   Globals.CB = SC && (

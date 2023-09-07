@@ -19,7 +19,9 @@ module.exports = elmt => {
       date: Date.now(),
       timeZoneOffset: TZO,
     },
-    sessionId: SID
+    ids: {
+      session: SID
+    }
   };
   DOC.title && (data.page.title = DOC.title);
   DOC.referrer && (data.page.referrer = DOC.referrer.toString());

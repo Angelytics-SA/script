@@ -9,7 +9,8 @@ const getMetadata = require('./getMetadata');
   error,
   type,
   tags = [], // dev, sales, design, ...
-  userId,
+  id,
+  userId = id,
   ect, // Encryption
   url, uri = url,
   extra, detail = extra, details = detail,
@@ -28,8 +29,7 @@ const getMetadata = require('./getMetadata');
   body && (data.event || (data.event = {}), data.event.body = body);
   (typeof userId === 'number' || userId)
     && (
-      data.event || (data.event = {}),
-      data.event.userId = typeof userId === 'object'
+      data.ids.user = typeof userId === 'object'
         && JSON.stringify(userId) || `${userId}`
     );
   tags

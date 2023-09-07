@@ -5,13 +5,21 @@
   <meta charset="utf-8">
   <title></title>
   <meta name="viewport"
-    content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <script>cb = data => console.log('CUSTOM:', data)</script>
+    content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+  >
+  <script>
+    document.cookie = "name=oeschger; SameSite=None; Secure";
+    document.cookie = "favorite_food=tripe; SameSite=None; Secure";
+    console.log('COOKIES', document.cookie);
+  </script>
+  <!-- <script>cb = data => console.log('CUSTOM:', data)</script> -->
   <script
     src="./bundled.js"
     type="text/javascript"
     account="$2b$10$C7XZ0twPgjfWL406wlImveqDgEfsgUgYZzip4lOWG.ApaXgrn2Zea"
     callback="cb"
+    ga="123 456"
+    disable-cookies
   ></script>
   <script src="./otherAnalytics.js">console.log("Hello inside script")</script>
   <style>
