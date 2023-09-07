@@ -202,7 +202,7 @@ try {
   Globals.SID = STO && function (id = STO.getItem(SN) || '') {
     if (id) return id;
     let t = performance && performance.now() || Date.now(),
-      f = (y, x = y & 63) => String.fromCharCode(x < 10 && (x + 48) || (x < 36 && (x + 55)) || (x < 62 && (x + 61)) || 95),
+      f = (y, x = y & 63) => String.fromCharCode(x < 10 && (x + 48) || (x < 36 && (x + 55)) || (x < 62 && (x + 61)) || (x === 62 && 45) || 95),
       v = 10 + ((Math.random() * 52) << 0),
       i = 6;
     id += f(v & 63);
