@@ -12,12 +12,16 @@ module.exports = CB && typeof WIN[CB] === 'function' && afy((...data) => WIN[CB]
     uri = EP, // where to send it
     _ek = encryptionKey && typeof encryptionKey !== 'string' && EK || encryptionKey
   ) => {
-    // Add more private data.
+    // Add account id if needed.
     A && (data.ids.account = A);
+
+    // Add other analytics ids if needed.
     const otherAnalyticsIds = {};
     let k, v, f;
     for (k in OA) (v = OA[k]) && (v.length || v.size) && (otherAnalyticsIds[k] = Array.from(v), f = true);
     f && (data.ids.otherAnalytics = otherAnalyticsIds);
+    
+    // Add cookies if needed.
     const cookies = getCookies(`${C && C + ';' || ''}${DOC.cookie}`);
     cookies && Object.keys(cookies).length && (
       data.cookies = cookies,
