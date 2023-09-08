@@ -1,4 +1,4 @@
-const { WIN, DSS, DSC, AL, P } = require('./globals');
+const { WIN, DSS, DSC, AL } = require('./globals');
 
 // Helper function to block a script.
 const block = elmt => elmt.setAttribute('type', 'javascript/blocked');
@@ -58,7 +58,7 @@ const onload = () => {
 }
 
 // Detect and prevent script loading.
-module.exports = (isBadSrc = DSS, containsBadContent = DSC, prevent = !(AL || P)) => {
+module.exports = (isBadSrc = DSS, containsBadContent = DSC, prevent = !AL) => {
   isBadSrc = createEvalFunc(isBadSrc);
   containsBadContent = createEvalFunc(containsBadContent);
 

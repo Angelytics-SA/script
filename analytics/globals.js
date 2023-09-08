@@ -259,20 +259,26 @@ try {
     src => {
       const o = src.includes('googletagmanager.com/gtag');
       if (!o) return false;
-      let i = src.split('?')[1], ids = i && i.match(/id\=[a-z0-9\-]+/gi) || [], l;
-      for (i = 0, l = ids.length; i !== l; ++i) Globals.DA.push(['ga', ids[i].replace(/id\=/i,'')]);
-      return true;
+      let i = src.split('?')[1], ids = i && i.match(/id\=[a-z0-9\-]+/gi) || [], l, j, r = true;
+      for (i = 0, l = ids.length; i !== l; ++i) {
+        Globals.DA.push(['ga', j = ids[i].replace(/id\=/i,'')]);
+        Globals.P && Globals.OA.ga.has(j) && (r = false);
+      };
+      return r;
     }
   ];
 
   // Script content to prevent loading.
   Globals.DSC = [
-    'window.dataLayer',
     content => {
-      for (let i = 0, l = Globals.DSS.length; i !== l; ++i) {
-        if (content.includes(Globals.DSS[i][1])) return true;
+      let gtmId, i= 0, da = Globals.DA, l = da.length , g, r;
+      for (; i !== l && !gtmId; ++i) {
+        gtmId = content.includes(g = da[i][1]) && g;
+        console.log('>', da[i][1]);
       }
-      return false;
+      return Globals.P ? (
+        gtmId ? !Globals.OA.ga.has(gtmId) : content.includes('window.dataLayer')
+      ) : gtmId || content.includes('window.dataLayer');
     }
   ];
 

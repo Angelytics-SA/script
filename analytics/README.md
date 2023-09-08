@@ -41,7 +41,7 @@ The script takes different variables:
           src="https://angelytics-sa.github.io/script/analytics.js"
           type="text/javascript"
           account="<your-account-id>"
-          ga="G-0123456789 G-ABCDEFGHIJ"
+          ga="G-0123456789"
         ></script>
 
         <!-- GOOGLE ANALYTICS | Google tag (gtag.js) | PROPERTY #1 -->
@@ -65,7 +65,7 @@ The script takes different variables:
         </script>
         ...
 
-    will send analytics to the GA accounts G-0123456789 and G-ABCDEFGHIJ using Angelitics tracking technology and prevent the execution of the GA scripts below and remove them from the DOM. However adding the flag *patch* will use directly GA's tracking technology to first collect analytics client side, then it will filter/mask sensitive data, like data found in forms or the user IP address, Angelytcis server side, ***before*** sending the analytics to Google's servers:
+    will send analytics to the GA account G-0123456789 using Angelitics tracking technology and prevent the execution of the GA scripts below (both G-0123456789 and G-ABCDEFGHIJ) and remove them from the DOM. However adding the flag *patch* will use directly GA's tracking technology to first collect analytics client side for G-0123456789, then it will filter/mask sensitive data, like data found in forms or the user IP address, Angelytcis server side, ***before*** sending the analytics to Google's servers. Then it will remove the scripts related to G-ABCDEFGHIJ:
 
       <head>
         <script
@@ -87,7 +87,7 @@ The script takes different variables:
         </script>
 
         <!-- SECOND GOOGLE ANALYTICS | Google tag (gtag.js) PROPERTY #2 -->
-        <!-- WILL BE EXECUTED BUT FILTERED SERVER SIDE -->
+        <!-- WON'T BE EXECUTED AND WILL BE REMOVED -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-ABCDEFGHIJ"></script>
         <script>
           window.dataLayer = window.dataLayer || [];

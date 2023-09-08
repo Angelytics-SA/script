@@ -14,16 +14,18 @@
   </script>
   <!-- <script>cb = data => console.log('CUSTOM:', data)</script> -->
   <script
-    src="./bundled.js"
+    src="./analytics.js"
     type="text/javascript"
     account="$2b$10$C7XZ0twPgjfWL406wlImveqDgEfsgUgYZzip4lOWG.ApaXgrn2Zea"
     callback="cb"
-    ga="123 456"
+    ga="G-QP6Z9CB6TK 456",
+    patch
     disable-cookies
   ></script>
   <script src="./otherAnalytics.js">console.log("Hello inside script")</script>
-  <!-- GOOGLE ANALYTICS | Google tag (gtag.js) -->
+  <!-- FIRST GOOGLE ANALYTICS PROPERTY -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-QP6Z9CB6TK"></script>
+  <!-- Google tag (gtag.js) -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
@@ -33,9 +35,9 @@
   </script>
 
 
-  <!-- SECOND GOOGLE ANALYTICS | Google tag (gtag.js) PROPERTY -->
-  <!-- Google tag (gtag.js) -->
+  <!-- SECOND GOOGLE ANALYTICS PROPERTY -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-MWGV59JH1P"></script>
+  <!-- Google tag (gtag.js) -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
