@@ -26,7 +26,7 @@ The script takes different variables:
 - **account:** *Required*. Your account id, provided by Angelytics.
 - **ga:** *Optional*. Your Google Analytics account ids to send the analytics to, if you want to visualize them on your current GA dashboard. Ex: ga="G-0123456789" or ga="G-0123456789 G-ABCDEFGHIJ G-KLMNOPQRST" for multiple accounts.
 - **fbq:** *Optional*. Your Pixel account ids to send the analytics to, if you want to visualize them on your current Pixel dashboard. Ex: fbq="vnlenvnepo" or fbq="coaencon 12e3ohcc 09uslnca" for multiple accounts.
-- **patch:** *Optional*. If used, it will patch the GA, Pixel, etc existing technology. If not present, Angelytics will try to prevent the execution of other analytic scripts. For example:
+- **patch:** *Optional*. If used, it will patch the GA, Pixel, etc existing technology. If not present, Angelytics will try to prevent the execution of other analytic scripts. For example the follow settup:
 
       <head>
         <script
@@ -56,7 +56,7 @@ The script takes different variables:
           gtag('config', 'G-ABCDEFGHIJ');
         </script>
 
-Will send analytics to the GA accounts G-0123456789 and G-ABCDEFGHIJ using Angelitics tracking technology and prevent the execution of the GA scripts below and remove them from the DOM. However adding the flag *patch* will use directly GA's tracking technology to first collect analytics client side, then it will filter/mask sensitive data, like data found in forms or the user IP address, server side, *before* sending the analytics to Google's servers:
+will send analytics to the GA accounts G-0123456789 and G-ABCDEFGHIJ using Angelitics tracking technology and prevent the execution of the GA scripts below and remove them from the DOM. However adding the flag *patch* will use directly GA's tracking technology to first collect analytics client side, then it will filter/mask sensitive data, like data found in forms or the user IP address, Angelytcis server side, ***before*** sending the analytics to Google's servers:
 
       <head>
         <script
@@ -64,7 +64,7 @@ Will send analytics to the GA accounts G-0123456789 and G-ABCDEFGHIJ using Angel
           type="text/javascript"
           account="<your-account-id>"
           ga="G-0123456789 G-ABCDEFGHIJ"
-          patch
+          **patch**
         ></script>
 
         <!-- GOOGLE ANALYTICS | Google tag (gtag.js) | PROPERTY #1 -->
