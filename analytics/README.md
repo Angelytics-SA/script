@@ -55,6 +55,7 @@ The script takes different variables:
           gtag('js', new Date());
           gtag('config', 'G-ABCDEFGHIJ');
         </script>
+        ...
 
     will send analytics to the GA accounts G-0123456789 and G-ABCDEFGHIJ using Angelitics tracking technology and prevent the execution of the GA scripts below and remove them from the DOM. However adding the flag *patch* will use directly GA's tracking technology to first collect analytics client side, then it will filter/mask sensitive data, like data found in forms or the user IP address, Angelytcis server side, ***before*** sending the analytics to Google's servers:
 
@@ -86,6 +87,7 @@ The script takes different variables:
           gtag('js', new Date());
           gtag('config', 'G-ABCDEFGHIJ');
         </script>
+        ...
 
 - **disable-cookies**: *Optional*. If added, will prevent further tracking technology to access or modify cookies. For example:
 
@@ -96,6 +98,7 @@ The script takes different variables:
           account="<your-account-id>"
           disable-cookies
         ></script>
+        ...
 
 - **allow-all**: *Optional*. If added, will allow further tracking script to be executed, even if the flag *patch* is not set. For example:
 
@@ -115,6 +118,7 @@ The script takes different variables:
           gtag('js', new Date());
           gtag('config', 'G-0123456789');
         </script>
+        ...
 
         will remove the GA scripts, while the following:
 
@@ -135,6 +139,7 @@ The script takes different variables:
           gtag('js', new Date());
           gtag('config', 'G-0123456789');
         </script>
+        ...
 
     will let the GA script slides, without trying to patch it.
 
@@ -153,6 +158,7 @@ The script takes different variables:
           account="<your-account-id>"
           callback="myFunction"
         ></script>
+        ...
 
 - **encription-key**: *Optional*. If specified, the sensitive part of the data will be automatically encripted before it is sent to Angelytics servers. For example:
 
@@ -163,67 +169,62 @@ The script takes different variables:
           account="<your-account-id>"
           encryption-key="$2b$10$C7XZ0twPgjfWL406wlImveqDgEfsgUgYZzip4lOWG.ApaXgrn2Zea"
         ></script>
+        ...
 
 ## Angelytics specific analytics collected and sent to the server
 
     {
-      "platform": {
-        "browser": "safari",
-        "renderingEngine": "blink",
-        "windowSizeType": "desktop",
-        "mobileType": "",
-        "hasTouchScreen": false,
-        "language": "en-US"
+      "platform": { // platform related information
+        "browser": <string enum> safari|chrome|chromium|seamonkey|firefox|opera|ie,
+        "renderingEngine": <string enum> edge|blink|gecko|webkit,
+        "windowSizeType": <string enum> desktop|phone|tablet|large-tablet,
+        "mobileType": <string enum> ios|android|windows|other|,
+        "hasTouchScreen": <bool> true|false,
+        "language": <string> like "en-US"
       },
-      "page": {
-        "location": "http://localhost:3000/",
-        "title": "Test Page"
+      "page": { // page related information
+        "location": <string> like "http://localhost:3000/",
+        "title": <string> like"Test Page"
       },
-      "timeAndGeolocation": {
-        "date": 1694198198544,
-        "timeZoneOffset": 7,
-        "timeZone": "America/Los_Angeles"
+      "timeAndGeolocation": { // time and geolocation info
+        "date": <number> like 1694198198544,
+        "timeZoneOffset": <number> like 7,
+        "timeZone": <string> like "America/Los_Angeles"
       },
-      "ids": {
-        "session": "jGNF57mOnz_vSDZuekqEXhc3QJ8iyrQW",
-        "account": "$2b$10$C7XZ0twPgjfWL406wlImveqDgEfsgUgYZzip4lOWG.ApaXgrn2Zea",
-        "otherAnalyticsToFeed": {
-          "ga": [
-            "123",
-            "456"
-          ]
+      "ids": { // list of ids relevant for the analytics
+        "session": <string> like "jGNF57mOnz_vSDZuekqEXhc3QJ8iyrQW",
+        "account": <string> like "$2b$10$C7XZ0twPgjfWL406wlImveqDgEfsgUgYZzip4lOWG.ApaXgrn2Zea",
+        "otherAnalyticsToFeed": { **OPTIONAL**
+          "ga": <array> like ["G-1234567890"],
+          "fbq": <array>
         },
-        "otherAnalyticsDetected": {
-          "ga": [
-            "G-QP6Z9CB6TK",
-            "G-MWGV59JH1P"
-          ]
+        "otherAnalyticsDetected": { **OPTIONAL**
+          "ga": <array> like ["G-ABCDEFGHIJ"],
+          "fbq": <array>
         }
       },
-      "element": {
-        "x": 0,
-        "y": 0,
-        "width": 807,
-        "height": 703,
-        "identifier": "angelytics-unique-body-id-1",
-        "tagName": "body"
+      "element": { // targetted element
+        "x": <number> like 0,
+        "y": <number> like 0,
+        "width": <number> like 807,
+        "height": <number> like 703,
+        "identifier": <string> like "angelytics-unique-body-id-1",
+        "tagName": <string> like "body"
       },
-      "event": {
-        "type": "session",
-        "name": "start",
-        "tags": [
-          "design",
-          "sales"
-        ]
+      "event": { // event that triggered the analytics
+        "type": <string> like "session",
+        "name": <string> like "start",
+        "tags": <array> like ["design", "sales"]
       },
-      "flags": {
-        "patch": false,
-        "allowAll": false,
-        "disableCookies": true,
-        "encrypted": false
+      "flags": { // flags and config used for the analytics
+        "patch": <bool>,
+        "allowAll": <bool>,
+        "disableCookies": <bool>,
+        "encrypted": <bool> or <aray>
       },
-      "cookies": {
-        "name": "oeschger",
-        "favorite_food": "tripe"
+      "cookies": { // Cookies present in the page
+        "key_1": "value_1",
+        ...,
+        "key_n": "value_n"
       }
     }
