@@ -13,6 +13,8 @@ Angelytics is a SAAS platforms that provides safe and regulation (like HIPAA) co
 
 # How to Install The Script
 
+See [example](test/index.html).
+
 Place the following html script element before your other analytics scripts, and preferably righ under the ***head*** tag. For example:
 
       <head>
