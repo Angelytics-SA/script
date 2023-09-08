@@ -40,13 +40,15 @@ try {
 
   // Encryption key.
   Globals.EK = SC && (
-    SC.getAttribute('apikey')
-    || SC.getAttribute('key')
-    || SC.getAttribute('publickey')
-    || SC.getAttribute('api-key')
+    SC.getAttribute('key')
+    || SC.getAttribute('encription')
+    || SC.getAttribute('encriptionKkey')
+    || SC.getAttribute('publicKey')
+    || SC.getAttribute('encription-key')
     || SC.getAttribute('public-key')
-    || SC.getAttribute('data-api-key')
+    || SC.getAttribute('data-encription-key')
     || SC.getAttribute('data-key')
+    || SC.getAttribute('data-encription')
     || SC.getAttribute('data-public-key')
   ) || undefined;
 
@@ -77,10 +79,32 @@ try {
     || SC.hasAttribute('data-disable-cookies')
   );
 
+  // Check if we patch or not.
+  Globals.P = SC && (
+    SC.hasAttribute('patch')
+    || SC.hasAttribute('data-patch')
+    || SC.hasAttribute('patching')
+    || SC.hasAttribute('data-patching')
+    || SC.hasAttribute('is-patching')
+    || SC.hasAttribute('isPatching')
+    || SC.hasAttribute('data-is-patching')
+    || SC.hasAttribute('patch-only')
+    || SC.hasAttribute('patchOnly')
+    || SC.hasAttribute('data-patch-only')
+  );
+
+  // Get cookies before we potentially disable them.
   Globals.C = DOC.cookie;
 
   // Namespace to operate in.
   Globals.NS = SC && SC.getAttribute('') || 'angelytics';
+
+  // Allow other analytics beside the risk.
+  Globals.AL = SC && (
+    SC.hasAttribute('allow-all')
+    || SC.hasAttribute('allowAll')
+    || SC.hasAttribute('data-allow-all')
+  );
 
   // List of GA id to patch.
   Globals.OA = {};
@@ -227,14 +251,29 @@ try {
     ['https://www.facebook.com/tr', 'https://api.angelytics.ai/fb-event']
   ];
 
+  // List of other detected analytics.
+  Globals.DA = [];
+
   // Script source to prevent loading.
   Globals.DSS = [
-    'googletagmanager.com/gtag'
+    src => {
+      const o = src.includes('googletagmanager.com/gtag');
+      if (!o) return false;
+      let i = src.split('?')[1], ids = i && i.match(/id\=[a-z0-9\-]+/gi) || [], l;
+      for (i = 0, l = ids.length; i !== l; ++i) Globals.DA.push(['ga', ids[i].replace(/id\=/i,'')]);
+      return true;
+    }
   ];
 
   // Script content to prevent loading.
   Globals.DSC = [
-    'window.dataLayer'
+    'window.dataLayer',
+    content => {
+      for (let i = 0, l = Globals.DSS.length; i !== l; ++i) {
+        if (content.includes(Globals.DSS[i][1])) return true;
+      }
+      return false;
+    }
   ];
 
   // Unique prefix id.

@@ -8,7 +8,7 @@ module.exports = elmt => {
       browser: BRO,
       renderingEngine: REN,
       windowSizeType: WST,
-      isMobile: MOB,
+      mobileType: MOB,
       hasTouchScreen: TS,
       language: NAV.language
     },

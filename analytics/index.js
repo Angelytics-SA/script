@@ -1,12 +1,13 @@
 // NODE_ENV=PROD node bundle -i scripts/analytics/index.js -o scripts/analytics/test/bundled.js
 (() => {
-  const { WIN, NS, TAGS, SC, STO, STO_GE, STO_TBC, STO_WN, DOC, DC, IDK } = require('./globals');
+  const { WIN, NS, TAGS, SC, STO, STO_GE, STO_TBC, STO_WN, DOC, DC, IDK, P } = require('./globals');
   const send = require('./send');
   const getMetadata = require('./getMetadata');
   let sendCustomEvent = () => {};
   const disableCookies = require('./disableCookies');
   const patch = require('./patch');
-  require('./preventScriptLoading')('other', null);
+  // require('./preventScriptLoading')('other', null);
+  require('./preventScriptLoading')();
 
   if (send) {
     const record = require('./record');
@@ -146,7 +147,7 @@
   DC && disableCookies();
 
   // Patch previous analytics if needed.
-  patch();
+  P && patch();
 
   // Augment code inside window object.
   Object.defineProperty(WIN, NS, {

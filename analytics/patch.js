@@ -1,4 +1,17 @@
-const { WIN, DOC, NAV, LOC, A, TP } = require('./globals');
+const { WIN, DOC, NAV, LOC, A, TP, OA } = require('./globals');
+const EP = (() => {
+  let v, o = '', k,
+    _l = LOC && new URL(LOC),
+    l = _l && encodeURIComponent(_l.origin + _l.pathname) || '';
+  l && (o += `&angelytics-current-page-url=${l}`);
+  A && (o += `&angelytics-account-id=${A}`);
+  for (k in OA) {
+    (v = OA[k])
+      && (v.length || v.size)
+      && (o += Array.from(v).reduce((o, v) => o += `&angelytics-patching-${k}=${v}`, ''));
+  }
+  return o.slice(1);
+})();
 
 // Filter out the last '/'.
 const normalizeUrl = (url, l = url.length) => l > 1 && url.charAt(l) === '/' && url.slice(0, l - 1) || url;
@@ -14,15 +27,11 @@ const normalizeUrlMap = map => new Map(
 const TO_PATCH = normalizeUrlMap(TP);
 
 // Get url parameters.
-const getUrlParams = (
-  url,
-  aKey = 'angelytics-account-id',
-  lKey = 'angelytics-current-page-url',
-  _l = LOC && new URL(LOC),
-  l = _l && encodeURIComponent(_l.origin + _l.pathname) || '',
-  p = `${url.search && '&' || '?'}${lKey}=${l}` + 
-    (A && `&${aKey}=${A}` || '')
-) => (url.search || '') + p + (url.hash || '');
+const getUrlParams = url => (
+  (url.search || '')
+  + (EP && `${url.search && '&' || '?'}${EP}` || '')
+  + (url.hash || '')
+);
 
 // Get/Modify url if needed.
 const getUrl = (

@@ -1,10 +1,10 @@
-const { WIN, DSS, DSC } = require('./globals');
+const { WIN, DSS, DSC, AL, P } = require('./globals');
 
 // Helper function to block a script.
 const block = elmt => elmt.setAttribute('type', 'javascript/blocked');
 
 // Helper function to create an observer callback to block a script when a script node is inserted.
-const createCallback = (isBadSrc, containsBadContent) => mutationList => {
+const createCallback = (isBadSrc, containsBadContent, prevent = !AL) => mutationList => {
   for (let i = 0, ml = mutationList.length || mutationList.size || 0, m; i !== ml; ++i) {
     if ((m = mutationList[i]).type !== 'childList') continue;
     for (let j = 0, a = m.addedNodes, al = a.length || a.size || 0; j !== al; ++j) {
@@ -13,6 +13,7 @@ const createCallback = (isBadSrc, containsBadContent) => mutationList => {
           isBadSrc(cn.getAttribute('src') || cn.src || '')
           || containsBadContent(cn.innerHTML || '')
         )
+        && prevent
         && block(cn);  
     }
   }
@@ -56,10 +57,16 @@ const onload = () => {
   WIN.removeEventListener('load', onload);
 }
 
-// Prevent script loading.
-module.exports = (isBadSrc = DSS, containsBadContent = DSC) => {
+// Detect and prevent script loading.
+module.exports = (isBadSrc = DSS, containsBadContent = DSC, prevent = !(AL || P)) => {
   isBadSrc = createEvalFunc(isBadSrc);
   containsBadContent = createEvalFunc(containsBadContent);
+
+  // Observe newly created scripts and bloc them if needed.
+  const observer = new MutationObserver(createCallback(isBadSrc, containsBadContent, prevent));  
+  observer.observe(document, { childList: true, subtree: true });
+
+  if (!prevent) return false;
 
   // Prevent a source to load programatically.
   const originalSetAttribute = HTMLScriptElement.prototype.setAttribute;
@@ -79,10 +86,8 @@ module.exports = (isBadSrc = DSS, containsBadContent = DSC) => {
     ...other
   });
 
-  // Observe newly created scripts and bloc them if needed.
-  const observer = new MutationObserver(createCallback(isBadSrc, containsBadContent));  
-  observer.observe(document, { childList: true, subtree: true });
-
   // Clean scripts once everything has been loaded.
   WIN.addEventListener('DOMContentLoaded', onload);
+
+  return true;
 }
