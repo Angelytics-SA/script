@@ -224,7 +224,8 @@ The script takes different variables:
       "event": { // event that triggered the analytics
         "type": <string> like "session",
         "name": <string> like "start",
-        "tags": <array> like ["design", "sales"]
+        "tags": <array> like ["design", "sales"],
+        "body": <any> **OPTIONAL**
       },
       "flags": { // flags and config used for the analytics
         "patch": <bool>,
