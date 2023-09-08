@@ -116,7 +116,7 @@ The script takes different variables:
           gtag('config', 'G-0123456789');
         </script>
 
-will remove the GA scripts while the following:
+        will remove the GA scripts, while the following:
 
       <head>
         <script
@@ -136,7 +136,7 @@ will remove the GA scripts while the following:
           gtag('config', 'G-0123456789');
         </script>
 
-will let the GA script slides, without trying to patch it.
+    will let the GA script slides, without trying to patch it.
 
 - **callback**: *Optional*. Specify the name of the function that will replace sending the analytics to Angelytics servers. For example:
       
