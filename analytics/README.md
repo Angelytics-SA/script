@@ -97,7 +97,7 @@ The script takes different variables:
         </script>
         ...
 
-    See [example](./test/index.html).
+    See [example](test/index.html).
 
 - **disable-cookies**: *Optional*. If added, will prevent further tracking technology to access or modify cookies. For example:
 

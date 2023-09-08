@@ -68,8 +68,8 @@ module.exports = CB && typeof WIN[CB] === 'function' && afy((...data) => WIN[CB]
       }
     }
 
-    console.log('SENT', JSON.stringify(data, null, 2));
-    return Promise.resolve(true);
+    // console.log('SENT', JSON.stringify(data, null, 2));
+    // return Promise.resolve(true);
 
     // Try to stringify the content.
     // Could fail if data contains cycles.

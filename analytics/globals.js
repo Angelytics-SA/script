@@ -274,7 +274,6 @@ try {
       let gtmId, i= 0, da = Globals.DA, l = da.length , g, r;
       for (; i !== l && !gtmId; ++i) {
         gtmId = content.includes(g = da[i][1]) && g;
-        console.log('>', da[i][1]);
       }
       return Globals.P ? (
         gtmId ? !Globals.OA.ga.has(gtmId) : content.includes('window.dataLayer')
