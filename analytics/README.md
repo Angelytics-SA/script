@@ -166,64 +166,64 @@ The script takes different variables:
 
 ## Angelytics specific analytics collected and sent to the server
 
-        {
-          "platform": {
-            "browser": "safari",
-            "renderingEngine": "blink",
-            "windowSizeType": "desktop",
-            "mobileType": "",
-            "hasTouchScreen": false,
-            "language": "en-US"
-          },
-          "page": {
-            "location": "http://localhost:3000/",
-            "title": "Test Page"
-          },
-          "timeAndGeolocation": {
-            "date": 1694198198544,
-            "timeZoneOffset": 7,
-            "timeZone": "America/Los_Angeles"
-          },
-          "ids": {
-            "session": "jGNF57mOnz_vSDZuekqEXhc3QJ8iyrQW",
-            "account": "$2b$10$C7XZ0twPgjfWL406wlImveqDgEfsgUgYZzip4lOWG.ApaXgrn2Zea",
-            "otherAnalyticsToFeed": {
-              "ga": [
-                "123",
-                "456"
-              ]
-            },
-            "otherAnalyticsDetected": {
-              "ga": [
-                "G-QP6Z9CB6TK",
-                "G-MWGV59JH1P"
-              ]
-            }
-          },
-          "element": {
-            "x": 0,
-            "y": 0,
-            "width": 807,
-            "height": 703,
-            "identifier": "angelytics-unique-body-id-1",
-            "tagName": "body"
-          },
-          "event": {
-            "type": "session",
-            "name": "start",
-            "tags": [
-              "design",
-              "sales"
-            ]
-          },
-          "flags": {
-            "patch": false,
-            "allowAll": false,
-            "disableCookies": true,
-            "encrypted": false
-          },
-          "cookies": {
-            "name": "oeschger",
-            "favorite_food": "tripe"
-          }
+    {
+      "platform": {
+        "browser": "safari",
+        "renderingEngine": "blink",
+        "windowSizeType": "desktop",
+        "mobileType": "",
+        "hasTouchScreen": false,
+        "language": "en-US"
+      },
+      "page": {
+        "location": "http://localhost:3000/",
+        "title": "Test Page"
+      },
+      "timeAndGeolocation": {
+        "date": 1694198198544,
+        "timeZoneOffset": 7,
+        "timeZone": "America/Los_Angeles"
+      },
+      "ids": {
+        "session": "jGNF57mOnz_vSDZuekqEXhc3QJ8iyrQW",
+        "account": "$2b$10$C7XZ0twPgjfWL406wlImveqDgEfsgUgYZzip4lOWG.ApaXgrn2Zea",
+        "otherAnalyticsToFeed": {
+          "ga": [
+            "123",
+            "456"
+          ]
+        },
+        "otherAnalyticsDetected": {
+          "ga": [
+            "G-QP6Z9CB6TK",
+            "G-MWGV59JH1P"
+          ]
         }
+      },
+      "element": {
+        "x": 0,
+        "y": 0,
+        "width": 807,
+        "height": 703,
+        "identifier": "angelytics-unique-body-id-1",
+        "tagName": "body"
+      },
+      "event": {
+        "type": "session",
+        "name": "start",
+        "tags": [
+          "design",
+          "sales"
+        ]
+      },
+      "flags": {
+        "patch": false,
+        "allowAll": false,
+        "disableCookies": true,
+        "encrypted": false
+      },
+      "cookies": {
+        "name": "oeschger",
+        "favorite_food": "tripe"
+      }
+    }
