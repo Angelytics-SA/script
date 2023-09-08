@@ -12,7 +12,7 @@ Place the following html script element before your other analytics scripts, and
           src="https://angelytics-sa.github.io/script/analytics.js"
           type="text/javascript"
           account="<your-account-id>"
-          disable-cookies
+          ...
         ></script>
 
         <!-- GOOGLE ANALYTICS | Google tag (gtag.js) -->
