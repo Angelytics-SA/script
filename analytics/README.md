@@ -6,12 +6,12 @@ Angelytics is a SAAS platforms that provides safe and regulation (like HIPAA) co
 ## Table of contents
 - [*Angelytics:* the analytics script](#angelytics-the-analytics-script)
   - [Table of contents](#table-of-contents)
-- [How to Instale the script](#how-to-instale-the-script)
+- [How to Install the script](#how-to-install-the-script)
 - [Angelytics specific analytics collected and sent to the server](#angelytics-specific-analytics-collected-and-sent-to-the-server)
-- [How to build/bundle the script](#how-to-buildbundle-the-script)
+- [How to build/bundle the analytics script](#how-to-buildbundle-the-analytics-script)
 
 
-# How to Instale the script
+# How to Install the script
 
 Place the following html script element before your other analytics scripts, and preferably righ under the *<head>* tag. For example:
 
@@ -237,7 +237,7 @@ The script takes different variables:
       }
     }
 
-# How to build/bundle the script
+# How to build/bundle the analytics script
 
 We use webpack to create and bundle the analytics script. The [bundle tool](https://github.com/Angelytics-SA/utils/blob/master/bundle.js) can be launch using the command line:
 
