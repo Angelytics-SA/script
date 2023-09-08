@@ -9,7 +9,7 @@ Place the following html script element before your other analytics scripts, and
 
       <head>
         <script
-          src="[https://angelytics-sa.github.io/script/script.js](https://angelytics-sa.github.io/script/script.js)"
+          src="https://angelytics-sa.github.io/script/analytics.js"
           type="text/javascript"
           account="<your-account-id>"
           disable-cookies
@@ -22,7 +22,7 @@ Place the following html script element before your other analytics scripts, and
         <script>...</script>
 
 The script takes different variables:
-- **src:** *Required*. [Where](https://angelytics-sa.github.io/script/script.js) to download the analytics from.
+- **src:** *Required*. [Where](https://angelytics-sa.github.io/script/analytics.js) to download the analytics from.
 - **account:** *Required*. Your account id, provided by Angelytics.
 - **ga:** *Optional*. Your Google Analytics account ids to send the analytics to, if you want to visualize them on your current GA dashboard. Ex: ga="G-0123456789" or ga="G-0123456789 G-ABCDEFGHIJ G-KLMNOPQRST" for multiple accounts.
 - **fbq:** *Optional*. Your Pixel account ids to send the analytics to, if you want to visualize them on your current Pixel dashboard. Ex: fbq="vnlenvnepo" or fbq="coaencon 12e3ohcc 09uslnca" for multiple accounts.
@@ -30,7 +30,7 @@ The script takes different variables:
 
       <head>
         <script
-          src="[https://angelytics-sa.github.io/script/script.js](https://angelytics-sa.github.io/script/script.js)"
+          src="https://angelytics-sa.github.io/script/analytics.js"
           type="text/javascript"
           account="<your-account-id>"
           ga="G-0123456789 G-ABCDEFGHIJ"
@@ -60,7 +60,7 @@ Will send analytics to the GA accounts G-0123456789 and G-ABCDEFGHIJ using Angel
 
       <head>
         <script
-          src="[https://angelytics-sa.github.io/script/script.js](https://angelytics-sa.github.io/script/script.js)"
+          src="https://angelytics-sa.github.io/script/analytics.js"
           type="text/javascript"
           account="<your-account-id>"
           ga="G-0123456789 G-ABCDEFGHIJ"
@@ -91,7 +91,7 @@ Will send analytics to the GA accounts G-0123456789 and G-ABCDEFGHIJ using Angel
 
       <head>
         <script
-          src="[https://angelytics-sa.github.io/script/script.js](https://angelytics-sa.github.io/script/script.js)"
+          src="https://angelytics-sa.github.io/script/analytics.js"
           type="text/javascript"
           account="<your-account-id>"
           disable-cookies
@@ -101,7 +101,7 @@ Will send analytics to the GA accounts G-0123456789 and G-ABCDEFGHIJ using Angel
 
       <head>
         <script
-          src="[https://angelytics-sa.github.io/script/script.js](https://angelytics-sa.github.io/script/script.js)"
+          src="https://angelytics-sa.github.io/script/analytics.js"
           type="text/javascript"
           account="<your-account-id>"
         ></script>
@@ -120,7 +120,7 @@ will remove the GA scripts while the following:
 
       <head>
         <script
-          src="[https://angelytics-sa.github.io/script/script.js](https://angelytics-sa.github.io/script/script.js)"
+          src="https://angelytics-sa.github.io/script/analytics.js"
           type="text/javascript"
           account="<your-account-id>"
           allow-all
@@ -148,7 +148,7 @@ will let the GA script slides, without trying to patch it.
 
         <!-- Angelytics script -->
         <script
-          src="[https://angelytics-sa.github.io/script/script.js](https://angelytics-sa.github.io/script/script.js)"
+          src="https://angelytics-sa.github.io/script/analytics.js"
           type="text/javascript"
           account="<your-account-id>"
           callback="myFunction"
@@ -158,7 +158,7 @@ will let the GA script slides, without trying to patch it.
 
       <head>
         <script
-          src="[https://angelytics-sa.github.io/script/script.js](https://angelytics-sa.github.io/script/script.js)"
+          src="https://angelytics-sa.github.io/script/analytics.js"
           type="text/javascript"
           account="<your-account-id>"
           encryption-key="$2b$10$C7XZ0twPgjfWL406wlImveqDgEfsgUgYZzip4lOWG.ApaXgrn2Zea"
