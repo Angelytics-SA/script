@@ -1,4 +1,5 @@
-# ![alt text](test/favicon.ico) *Angelytics:* the analytics script
+![alt text](test/favicon.ico)
+# *Angelytics:* the analytics script
 
 Angelytics is a SAAS platforms that provides safe and regulation (like HIPAA) compliant analytics. It also allows you to work with your current analytic tools such as Meta Pixel (Pixel), Google Analytics (GA) and Google Tag Manager (GTM).
 
