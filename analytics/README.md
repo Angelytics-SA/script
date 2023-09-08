@@ -3,7 +3,15 @@
 
 Angelytics is a SAAS platforms that provides safe and regulation (like HIPAA) compliant analytics. It also allows you to work with your current analytic tools such as Meta Pixel (Pixel), Google Analytics (GA) and Google Tag Manager (GTM).
 
-## How to Instale the script
+## Table of contents
+- [*Angelytics:* the analytics script](#angelytics-the-analytics-script)
+  - [Table of contents](#table-of-contents)
+- [How to Instale the script](#how-to-instale-the-script)
+- [Angelytics specific analytics collected and sent to the server](#angelytics-specific-analytics-collected-and-sent-to-the-server)
+- [How to build/bundle the script](#how-to-buildbundle-the-script)
+
+
+# How to Instale the script
 
 Place the following html script element before your other analytics scripts, and preferably righ under the *<head>* tag. For example:
 
@@ -171,7 +179,7 @@ The script takes different variables:
         ></script>
         ...
 
-## Angelytics specific analytics collected and sent to the server
+# Angelytics specific analytics collected and sent to the server
 
     {
       "platform": { // platform related information
@@ -228,3 +236,9 @@ The script takes different variables:
         "key_n": "value_n"
       }
     }
+
+# How to build/bundle the script
+
+We use webpack to create and bundle the analytics script. The [bundle tool](https://github.com/Angelytics-SA/utils/blob/master/bundle.js) can be launch using the command line:
+
+    NODE_ENV=PROD node <path-to-utils>/bundle -i <path-to-scripts>/analytics/index.js -o <path-to-analytics>/analytics.js
