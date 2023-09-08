@@ -56,7 +56,7 @@ The script takes different variables:
           gtag('config', 'G-ABCDEFGHIJ');
         </script>
 
-will send analytics to the GA accounts G-0123456789 and G-ABCDEFGHIJ using Angelitics tracking technology and prevent the execution of the GA scripts below and remove them from the DOM. However adding the flag *patch* will use directly GA's tracking technology to first collect analytics client side, then it will filter/mask sensitive data, like data found in forms or the user IP address, Angelytcis server side, ***before*** sending the analytics to Google's servers:
+    will send analytics to the GA accounts G-0123456789 and G-ABCDEFGHIJ using Angelitics tracking technology and prevent the execution of the GA scripts below and remove them from the DOM. However adding the flag *patch* will use directly GA's tracking technology to first collect analytics client side, then it will filter/mask sensitive data, like data found in forms or the user IP address, Angelytcis server side, ***before*** sending the analytics to Google's servers:
 
       <head>
         <script
@@ -64,7 +64,7 @@ will send analytics to the GA accounts G-0123456789 and G-ABCDEFGHIJ using Angel
           type="text/javascript"
           account="<your-account-id>"
           ga="G-0123456789 G-ABCDEFGHIJ"
-          **patch**
+          patch
         ></script>
 
         <!-- GOOGLE ANALYTICS | Google tag (gtag.js) | PROPERTY #1 -->
