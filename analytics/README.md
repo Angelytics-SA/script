@@ -1,17 +1,17 @@
 ![alt text](test/favicon.ico)
-# *Angelytics:* the analytics script
+# *Angelytics:* The Analytics Script
 
 Angelytics is a SAAS platforms that provides safe and regulation (like HIPAA) compliant analytics. It also allows you to work with your current analytic tools such as Meta Pixel (Pixel), Google Analytics (GA) and Google Tag Manager (GTM).
 
-## Table of contents
-- [*Angelytics:* the analytics script](#angelytics-the-analytics-script)
-  - [Table of contents](#table-of-contents)
-- [How to Install the script](#how-to-install-the-script)
-- [Angelytics specific analytics collected and sent to the server](#angelytics-specific-analytics-collected-and-sent-to-the-server)
+## Table Of Contents
+- [*Angelytics:* The Analytics Script](#angelytics-the-analytics-script)
+  - [Table Of Contents](#table-of-contents)
+- [How to Install The Script](#how-to-install-the-script)
+- [Angelytics-Specific Analytics Collected And Sent To The Server](#angelytics-specific-analytics-collected-and-sent-to-the-server)
 - [How to build/bundle the analytics script](#how-to-buildbundle-the-analytics-script)
 
 
-# How to Install the script
+# How to Install The Script
 
 Place the following html script element before your other analytics scripts, and preferably righ under the *<head>* tag. For example:
 
@@ -179,7 +179,7 @@ The script takes different variables:
         ></script>
         ...
 
-# Angelytics specific analytics collected and sent to the server
+# Angelytics-Specific Analytics Collected And Sent To The Server
 
     {
       "platform": { // platform related information
