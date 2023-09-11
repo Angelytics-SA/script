@@ -59,7 +59,7 @@ const ready = (doc, callback) => {
   return doc.addEventListener('DOMContentLoaded', cb);
 }
 
-// Hlper function to clean node content.
+// Helper function to clean node content.
 const cleanNode = root => {
   for (const node of root.childNodes) {
     node instanceof Text && !(node.textContent || '').replace(/\s+/, '') && node.remove();
@@ -74,6 +74,8 @@ const _slot = document.createElement('slot'),
   _body= document.createElement('body'),
   _script= document.createElement('script'),
   _documentFragment = new DocumentFragment;
+
+// Set main template inner html.
 _container.innerHTML = `
 <style>
 iframe {
@@ -88,6 +90,7 @@ iframe {
 `;
 cleanNode(_container.content);
 
+// Set head template inner html.
 _head.innerHTML = `
 <style>
 
@@ -114,12 +117,15 @@ body {
 </style>`;
 cleanNode(_head);
 
+// Set script template type attribute.
 _script.setAttribute('type', 'text/javascript');
 
+// To generate iframe ids.
 let CNT = 0, PRE = 'generated-analytics-shield-id-';
 
 // Main class.
 class Shield extends HTMLElement {
+  // Private class properties.
   #slot;
   #container;
 
@@ -197,7 +203,7 @@ window.addEventListener('DOMContentLoaded', onload);`;
         // Swap nodes.
         slot.parentNode.replaceChild(container, slot);
 
-        // Setup iframe.
+        // Setup iframe dimensions.
         let v;
         (v = this.getAttribute('width')) 
           && v !== 'auto'
@@ -215,12 +221,14 @@ window.addEventListener('DOMContentLoaded', onload);`;
             && iframe.setAttribute(attr.name, attr.value);
         }
 
+        // Fill iframe, via the src attribute.
         iframe.setAttribute('src', `data:text/html;charset=utf-8,<!DOCTYPE html>${head.outerHTML}${body.outerHTML}</html>`);
 
         // Lock iframe source if needed.
         lockSrc(iframe);
       };
 
+    // Set iframe id.
     iframe.setAttribute('id', id);
 
     // Add event listener to slot element.
@@ -230,7 +238,7 @@ window.addEventListener('DOMContentLoaded', onload);`;
     shadowRoot.appendChild(slot);
   }
 
-  // Tackle other behavior, like specifying a source.
+  // Tackle other behavior, like specifying an external source.
   connectedCallback () {
     const src = this.getAttribute('src');
 
