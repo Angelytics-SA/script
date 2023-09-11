@@ -127,6 +127,7 @@ let CNT = 0, PRE = 'generated-analytics-shield-id-';
 class Shield extends HTMLElement {
   // Private class properties.
   #slot;
+  #iframe;
   #container;
 
   // Constructor.
@@ -137,7 +138,7 @@ class Shield extends HTMLElement {
     // Create iframe, slot and event listener.
     const container = this.#container = _container.content.cloneNode(true),
       id = `${PRE}${++CNT}`,
-      iframe = container.childNodes[1],
+      iframe = this.#iframe = container.childNodes[1],
       slot = this.#slot = _slot.cloneNode(true),
       shadowRoot = this.attachShadow({ mode: 'open' }),
       onslotchange = e => {
@@ -148,7 +149,8 @@ class Shield extends HTMLElement {
         const head = _head.cloneNode(true),
           body = _body.cloneNode(true),
           script = _script.cloneNode(true),
-          childNodes = e.target.assignedNodes({ flatten: true });
+          childNodes = e.target.assignedNodes({ flatten: true }),
+          loadEventId = this.#iframe.getAttribute('id') || this.#iframe.id;
 
         // Add elements either to the head or the body.
         let content = head;
@@ -169,11 +171,14 @@ class Shield extends HTMLElement {
   const body = document.body,
     html = document.documentElement,
     o = {
-      w: Math.max(body.scrollWidth || 0, body.offsetWidth || 0, html.clientWidth || 0, html.scrollWidth || 0, html.offsetWidth || 0),
-      h: Math.max(body.scrollHeight || 0, body.offsetHeight || 0, html.clientHeight || 0, html.scrollHeight || 0, html.offsetHeight || 0)
+      eventId: '${loadEventId}',
+      data: {
+        width: Math.max(body.scrollWidth || 0, body.offsetWidth || 0, html.clientWidth || 0, html.scrollWidth || 0, html.offsetWidth || 0),
+        height: Math.max(body.scrollHeight || 0, body.offsetHeight || 0, html.clientHeight || 0, html.scrollHeight || 0, html.offsetHeight || 0)
+      }
     };
   const cb = () => {
-    window.top.postMessage('event-for-${id}' + JSON.stringify(o), '*');
+    window.top.postMessage(JSON.stringify(o), '*');
   },
   observer = new MutationObserver(cb);
   observer.observe(body, { childList: true, subtree: true });
@@ -191,15 +196,25 @@ window.addEventListener('DOMContentLoaded', onload);`;
         // cross-origin restrictions.
         // See script inner html above for the postMessage action.
         const cb = e => {
-          const data = e.data || '',
-            refId = `event-for-${id}`,
-            str = data.replace(refId, ''),
-            eventId = data.replace(str, '');
-          if (eventId === refId) {
-            const { w, h } = JSON.parse(str);
-            iframe.style['min-width'] = w + 'px';
-            iframe.style['min-height'] = h + 'px';
-          }
+          try {
+            const o = JSON.parse(e.data || '');
+            // If the message sent correspond to the expected message.
+            if (o && typeof o === 'object' && o.eventId === (iframe.getAttribute('id') || iframe.id)) {
+              let { width, height } = o.data || {};
+
+              // Set iframe min width.
+              width && (
+                parseFloat(width) === width && (width += 'px'), // in case we forgot units
+                iframe.style['min-width'] = width
+              );
+
+              // Set iframe min height.
+              height && (
+                parseFloat(height) === height && (height += 'px'), // in case we forgot units
+                iframe.style['min-height'] = height
+              );
+            }
+          } catch {};
           // window.removeEventListener('message', cb);
         }
         window.addEventListener('message', cb);
@@ -248,7 +263,11 @@ window.addEventListener('DOMContentLoaded', onload);`;
 
   // Tackle other behavior, like specifying an external source.
   connectedCallback () {
-    const src = this.getAttribute('src');
+    const src = this.getAttribute('src'),
+      loadEventId = this.getAttribute('loadeventid')
+      || this.getAttribute('loadEventId')
+      || this.getAttribute('load-event-id');
+    loadEventId && this.#iframe.setAttribute('id', loadEventId);
 
     // If source is specified instead of children.
     if (src) {
