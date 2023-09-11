@@ -223,7 +223,9 @@ window.addEventListener('DOMContentLoaded', onload);`;
 
         // Fill iframe, via the src attribute.
         // Why? Because otherwise javascript scripts won't execute
-        // if we add script nodes programmatically.
+        // if we add script nodes programmatically, due to cross-origin
+        // protection, which is themechanism we use to prevent crawlers
+        // and trackers to access the content.
         iframe.setAttribute('src', `data:text/html;charset=utf-8,<!DOCTYPE html>${head.outerHTML}${body.outerHTML}</html>`);
 
         // Lock iframe source if needed.
