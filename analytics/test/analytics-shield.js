@@ -263,4 +263,5 @@ window.addEventListener('DOMContentLoaded', onload);`;
   }
 }
 
+// Register extended class.
 window.customElements.define('analytics-shield', Shield);
