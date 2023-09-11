@@ -186,6 +186,10 @@ window.addEventListener('DOMContentLoaded', onload);`;
         head.appendChild(script);
 
         // Register window message.
+        // This is the machanism we use to communicate from
+        // the iframe to the parent window, without violating
+        // cross-origin restrictions.
+        // See script inner html above for the postMessage action.
         const cb = e => {
           const data = e.data || '',
             refId = `event-for-${id}`,
