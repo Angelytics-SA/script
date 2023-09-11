@@ -150,7 +150,7 @@ class Shield extends HTMLElement {
           body = _body.cloneNode(true),
           script = _script.cloneNode(true),
           childNodes = e.target.assignedNodes({ flatten: true }),
-          loadEventId = this.#iframe.getAttribute('id') || this.#iframe.id;
+          loadEventId = this.loadEventId;
 
         // Add elements either to the head or the body.
         let content = head;
@@ -198,8 +198,9 @@ window.addEventListener('DOMContentLoaded', onload);`;
         const cb = e => {
           try {
             const o = JSON.parse(e.data || '');
+            
             // If the message sent correspond to the expected message.
-            if (o && typeof o === 'object' && o.eventId === (iframe.getAttribute('id') || iframe.id)) {
+            if (o && typeof o === 'object' && o.eventId === loadEventId) {
               let { width, height } = o.data || {};
 
               // Set iframe min width.
@@ -261,13 +262,26 @@ window.addEventListener('DOMContentLoaded', onload);`;
     shadowRoot.appendChild(slot);
   }
 
+  get loadEventId() {
+    return this.#iframe.getAttribute('loadeventid')
+    || this.#iframe.getAttribute('load-event-id')
+    || this.#iframe.loadEventId
+    || this.#iframe.loadeventid
+    || this.#iframe.getAttribute('id')
+    || this.#iframe.id
+    || this.getAttribute('loadeventid')
+    || this.getAttribute('loadEventId')
+    || this.getAttribute('load-event-id')
+    || this.loadEventId
+    || this.loadeventid
+    || this.getAttribute('id')
+    || this.id;
+  }
+
   // Tackle other behavior, like specifying an external source.
   connectedCallback () {
-    const src = this.getAttribute('src'),
-      loadEventId = this.getAttribute('loadeventid')
-      || this.getAttribute('loadEventId')
-      || this.getAttribute('load-event-id');
-    loadEventId && this.#iframe.setAttribute('id', loadEventId);
+    const src = this.getAttribute('src'), loadEventId = this.loadEventId;
+    loadEventId && this.#iframe.setAttribute('loadeventid', loadEventId);
 
     // If source is specified instead of children.
     if (src) {
