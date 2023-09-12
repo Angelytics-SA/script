@@ -19,8 +19,33 @@ try {
   // Browser document.
   const DOC = Globals.DOC = WIN.document || document;
 
+
+  // Document element.
+  const DOC_EL = Globals.DOC_EL = WIN.documentElement || DOC.documentElement;
+
   // User agent.
   const UA = Globals.UA = NAV.userAgent || '';
+
+  // Deprecated related info.
+  // Those properties have been used in "browser sniffing" code:
+  // scripts that attempt to find out what kind of browser you
+  // are using and adjust pages accordingly. This lead to the
+  // current situation, where browsers had to return fake values
+  // from these properties in order not to be locked out of some websites.
+  Globals.DEP = {
+    app: {
+      version: NAV.appVersion || '',
+      codeName: NAV.appCodeName || '',
+      name: NAV.appName || ''
+    },
+    vendor: NAV.vendor || '',
+    platform: NAV.platform || '',
+    product: NAV.product || '',
+    subproduct: NAV.productSub
+  };
+
+  // Check if cookies have been enabled at a browser level.
+  Globals.CA = NAV.cookieEnabled;
 
   // Current page url.
   Globals.LOC = (WIN.location || location || {}).href;
@@ -211,12 +236,19 @@ try {
     || (IS_WEBKIT && 'webkit');
 
   // Device size.
-  const WIDTH = WIN.innerWidth || WIN.documentElement.clientWidth;
+  const WIDTH = WIN.innerWidth || DOC_EL.clientWidth || DOC.body.clientWidth,
+    HEIGHT = WIN.innerHeight || DOC_EL.clientHeight || DOC.body.clientHeight;
   Globals.WST = MOB && (
     (WIDTH < 480 && 'phone')
     || (WIDTH > 1152 && 'large-tablet')
     || (WIDTH && 'tablet')
   ) || 'desktop';
+
+  // Device resolution.
+  Globals.RES = {
+    width: WIDTH,
+    height: HEIGHT
+  }
 
   // Timezone.
   const TZO = Globals.TZO = Math.round((new Date).getTimezoneOffset() / 60);
