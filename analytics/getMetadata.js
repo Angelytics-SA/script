@@ -1,5 +1,6 @@
-const { WIN, DOC, DOC_EL, NAV, BRO, REN, WST, MOB, TS, LOC, TZO, SID, RES, UA, DEP, CA } = require('./globals');
+const { WIN, DOC, DOC_EL, NAV, BRO, REN, WST, MOB, TS, LOC, TZO, SID, RES, UA, DEP, CA, C } = require('./globals');
 const getElementMetadata = require('./getElementMetadata');
+const getCookies = require('./getCookies');
 
 // Helper function to get the metadata.
 module.exports = elmt => {
@@ -43,6 +44,10 @@ module.exports = elmt => {
   // Get element metadata.
   const element = getElementMetadata(elmt);
   element && (data.element = element);
+
+  // Add cookies if needed.
+  const cookies = getCookies(`${C && C + ';' || ''}${DOC.cookie}`);
+  cookies && Object.keys(cookies).length && (data.cookies = cookies);
   
   return data;
 }

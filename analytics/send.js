@@ -1,7 +1,6 @@
-const { DOC, WIN, NAV, A, CB, EP, EK, OA, C, DC, P, AL, DA } = require('./globals');
+const { WIN, NAV, A, CB, EP, EK, OA, DC, P, AL, DA } = require('./globals');
 const ec = require('./eecClientEncrypt');
 const afy = require('./asyncify');
-const getCookies = require('./getCookies');
 
 // Function to send data to servers.
 module.exports = CB && typeof WIN[CB] === 'function' && afy((...data) => WIN[CB].apply(WIN, data))
@@ -28,10 +27,6 @@ module.exports = CB && typeof WIN[CB] === 'function' && afy((...data) => WIN[CB]
       disableCookies: DC,
       encrypted: !!_ek
     };
-    
-    // Add cookies if needed.
-    const cookies = getCookies(`${C && C + ';' || ''}${DOC.cookie}`);
-    cookies && Object.keys(cookies).length && (data.cookies = cookies);
 
     // Add detected analytics.
     let detected = {};
