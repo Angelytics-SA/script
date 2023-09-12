@@ -8,7 +8,7 @@ module.exports = elmt => {
       browser: BRO,
       userAgent: UA,
       renderingEngine: REN,
-      windowSizeType: WST,
+      sessionStartWindowSizeType: WST,
       sessionStartScreenResolution: RES,
       currentScreenResolution: {
         width: WIN.innerWidth || DOC_EL.clientWidth || DOC.body.clientWidth,
