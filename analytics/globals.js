@@ -118,6 +118,16 @@ try {
     || SC.hasAttribute('data-patch-only')
   );
 
+  // Dev / Debug mode.
+  Globals.DV = SC && (
+    SC.hasAttribute('debug')
+    || SC.hasAttribute('dev')
+    || SC.hasAttribute('development')
+    || SC.hasAttribute('data-debug')
+    || SC.hasAttribute('data-dev')
+    || SC.hasAttribute('data-development')
+  );
+
   // Get cookies before we potentially disable them.
   Globals.C = DOC.cookie;
 

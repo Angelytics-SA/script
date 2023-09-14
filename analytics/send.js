@@ -1,4 +1,4 @@
-const { WIN, NAV, A, CB, EP, EK, OA, DC, P, AL, DA } = require('./globals');
+const { WIN, NAV, A, CB, EP, EK, OA, DC, P, AL, DA, DV } = require('./globals');
 const ec = require('./eecClientEncrypt');
 const afy = require('./asyncify');
 
@@ -22,6 +22,7 @@ module.exports = CB && typeof WIN[CB] === 'function' && afy((...data) => WIN[CB]
 
     // Add flag about patching and allowing othe analytics.
     data.flags = {
+      mode: DV && 'dev' || 'prod',
       patch: P,
       allowAll: AL,
       disableCookies: DC,
