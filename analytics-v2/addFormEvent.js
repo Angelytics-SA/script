@@ -1,9 +1,10 @@
 const { DOC, TAGS } = require('./globals');
 const record = require('./record');
 
+// A map of form elements targetted by user interactions.
 const FORMS = new Map;
 
-// Hlper function to get the form and its status.
+// Helper function to get the form and its status.
 const getForm = elmt => {
   try {
     // Get parent form.
