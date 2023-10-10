@@ -91,6 +91,6 @@ const submitEventHandler = ({ target: elmt } = {}) => {
   );
 }
 
-// register handlers.
+// Register handlers.
 DOC.addEventListener('input', inputEventHandler);
 DOC.addEventListener('submit', submitEventHandler);
