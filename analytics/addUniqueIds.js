@@ -1,4 +1,5 @@
 const { DOC, PRE_ID, IDK } = require('./globals');
+const getChildNodes = require('./getChildNodes');
 let CNT = 0;
 const getCnt = (n = ++CNT) => n.toString(36);
 
@@ -17,7 +18,7 @@ module.exports = node => {
       );
 
     // Add child nodes to the queue.
-    for (i = 0, c = n.childNodes || [], l = c.length; i !== l; ++i) q.push(c[i]);
+    for (i = 0, c = getChildNodes(n), l = c.length; i !== l; ++i) q.push(c[i]);
   }
   return node;
 }

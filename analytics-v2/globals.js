@@ -59,22 +59,7 @@ try {
   Globals.STO_WN = `${STO_PRE}-window-name`;
 
   // Current script.
-  const scs = DOC.getElementsByTagName && DOC.getElementsByTagName('script'),
-    SC = Globals.SC = scs[scs.length - 1];
-
-  // Encryption key.
-  Globals.EK = SC && (
-    SC.getAttribute('key')
-    || SC.getAttribute('encription')
-    || SC.getAttribute('encriptionKkey')
-    || SC.getAttribute('publicKey')
-    || SC.getAttribute('encription-key')
-    || SC.getAttribute('public-key')
-    || SC.getAttribute('data-encription-key')
-    || SC.getAttribute('data-key')
-    || SC.getAttribute('data-encription')
-    || SC.getAttribute('data-public-key')
-  ) || undefined;
+  const SC = Globals.SC = DOC.currentScript;
 
   // Account id.
   Globals.A = SC && (
@@ -103,20 +88,6 @@ try {
     || SC.hasAttribute('data-disable-cookies')
   );
 
-  // Check if we patch or not.
-  Globals.P = SC && (
-    SC.hasAttribute('patch')
-    || SC.hasAttribute('data-patch')
-    || SC.hasAttribute('patching')
-    || SC.hasAttribute('data-patching')
-    || SC.hasAttribute('is-patching')
-    || SC.hasAttribute('isPatching')
-    || SC.hasAttribute('data-is-patching')
-    || SC.hasAttribute('patch-only')
-    || SC.hasAttribute('patchOnly')
-    || SC.hasAttribute('data-patch-only')
-  );
-
   // Dev / Debug mode.
   Globals.DV = SC && (
     SC.hasAttribute('debug')
@@ -132,13 +103,6 @@ try {
 
   // Namespace to operate in.
   Globals.NS = SC && SC.getAttribute('') || 'angelytics';
-
-  // Allow other analytics beside the risk.
-  Globals.AL = SC && (
-    SC.hasAttribute('allow-all')
-    || SC.hasAttribute('allowAll')
-    || SC.hasAttribute('data-allow-all')
-  );
 
   // List of GA id to patch.
   Globals.OA = {};
@@ -286,50 +250,15 @@ try {
   // Analytics Endpoint.
   Globals.EP = 'https://api.angelytics.ai/event';
 
-  // To patch.
-  Globals.TP = [
-    ['https://www.google-analytics.com/g/collect', 'https://api.angelytics.ai/g-event'],
-    ['https://www.facebook.com/tr', 'https://api.angelytics.ai/fb-event']
-  ];
-
   // List of other detected analytics.
   Globals.DA = [];
-
-  // Script source to prevent loading.
-  Globals.DSS = [
-    src => {
-      const o = src.includes('googletagmanager.com/gtag');
-      if (!o) return false;
-      let i = src.split('?')[1], ids = i && i.match(/id\=[a-z0-9\-]+/gi) || [], l, j, r = true;
-      for (i = 0, l = ids.length; i !== l; ++i) {
-        Globals.DA.push(['ga', j = ids[i].replace(/id\=/i,'')]);
-        Globals.P && Globals.OA.ga.has(j) && (r = false);
-      };
-      return r;
-    }
-  ];
-
-  // Script content to prevent loading.
-  Globals.DSC = [
-    content => {
-      let gtmId, i= 0, da = Globals.DA, l = da.length , g, r;
-      for (; i !== l && !gtmId; ++i) {
-        gtmId = content.includes(g = da[i][1]) && g;
-      }
-      return Globals.P ? (
-        gtmId ? !Globals.OA.ga.has(gtmId) : content.includes('window.dataLayer')
-      ) : gtmId || content.includes('window.dataLayer');
-    }
-  ];
 
   // Unique prefix id.
   Globals.PRE_ID = 'angelytics-unique';
   Globals.IDK = '__angelytics_unique_id__';
   
-  Globals.CLIENT = true;
-} catch {
-  Globals.SERVER = true;
-};
+  Globals.LOADED = true;
+} catch {};
 
 // Exports.
 module.exports = Object.freeze(Globals);

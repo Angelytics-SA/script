@@ -127,17 +127,37 @@ try {
 
 // Utils to evaluate an element property.
 const _evalElmtProperty = (selector, property, trim) => {
-  let elements = document.querySelectorAll(selector) || [],
-    i = 0,
-    l = elements.length,
-    output = new Array(l);
+  // Get all nodes we want to query select from.
+  let queue = [document], output = [], node, elements, i, l, q;
+  while (node = queue.pop()) {
+    elements = document.querySelectorAll(selector) || [];
+    i = 0;
+    l = elements.length;
 
-  if (trim) for (; i !== l; ++i) output[i] = (elements[i][property] || '').trim();
-  else for (; i !== l; ++i) output[i] = elements[i][property];
+    // Add props.
+    if (trim) for (; i !== l; ++i) output.push((elements[i][property] || '').trim());
+    else for (; i !== l; ++i) output.push(elements[i][property]);
+
+    // Crawl to see if there's any custom elements.
+    q = [node];
+    while (node = q.pop()) {
+      for (i = 0, 
+        elements = node.childNodes || (node.assignedNodes && node.assignedNodes()) || [],
+        l = elements.length;
+        i !== l;
+        ++i
+      ) {
+        (node = elements[i]).shadowRoot && queue.push(node.shadowRoot)
+        || (((node.tagName || '').match(/[^a-zA-Z0-9]/) || []).length && queue.push(node))
+        || q.push(node);
+      }
+    }
+  }
 
   return output;
-}, evalElmtProperty = async (page, selector, property, trim) => (
-  await evaluate(page, _evalElmtProperty, selector, property, trim )
+},
+evalElmtProperty = async (page, selector, property, trim) => (
+  await evaluate(page, _evalElmtProperty, selector, property, trim)
 );
 
 // Exports.

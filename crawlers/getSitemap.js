@@ -36,7 +36,7 @@ const getXml = () => {
     } catch {}
 
     // Add child nodes to the list, to continue the traversial.
-    for (i = 0, c = node.childNodes || [], l = c.length; i !== l; ++i) {
+    for (i = 0, c = node.childNodes || (node.assignedNodes && node.assignedNodes()) || [], l = c.length; i !== l; ++i) {
       queue.push(c[i]);
     }
   }

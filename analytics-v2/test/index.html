@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Test Page</title>
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+  >
+  <script>
+    document.cookie = "name=oeschger; SameSite=None; Secure";
+    document.cookie = "favorite_food=tripe; SameSite=None; Secure";
+    console.log('COOKIES', document.cookie);
+  </script>
+  <script>cb = data => console.log('CUSTOM:', data)</script>
+  <script
+    src="./analytics.js"
+    type="text/javascript"
+    account="$2b$10$C7XZ0twPgjfWL406wlImveqDgEfsgUgYZzip4lOWG.ApaXgrn2Zea"
+    callback="cb"
+    ga="G-QP6Z9CB6TK"
+  ></script>
+  <script src="./analytics-shield.js"></script>
+  
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+      overflow: visible;
+      overflow-anchor: auto;
+      scroll-behavior: smooth;
+    }
+
+    *:focus {
+      outline: none;
+      outline-style: none;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      /* font-family: Arial, Avenir, Calibri, Tahoma, "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, sans-serif; */
+    }
+
+    body {
+      overflow-y: hidden;
+    }
+
+    #container {
+      overflow: overlay;
+      overflow-y: scroll;
+      height: 100%;
+      padding: 8px;
+    }
+
+    form.form-example {
+      display: table;
+    }
+
+    div.form-example {
+      display: table-row;
+    }
+
+    label,
+    input {
+      display: table-cell;
+      margin-bottom: 10px;
+    }
+
+    label {
+      padding-right: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <div id="1" onmousedown="alert('click me')">
+      click me
+    </div>
+    <div id="2">
+      click me too
+    </div>
+    <div id="3">
+      click me last
+    </div>
+    <form id="form-example" class="form-example">
+      <div class="form-example">
+        <label for="name">Enter your name: </label>
+        <input type="text" name="name" id="name" required />
+      </div>
+      <div class="form-example">
+        <label for="email">Enter your email: </label>
+        <input type="email" name="email" id="email" />
+      </div>
+      <div class="form-example">
+        <input type="submit" value="Subscribe!" />
+      </div>
+    </form>
+    <analytics-shield width="100px" height="auto">
+      <style>
+        form.form-example {
+          display: table;
+        }
+
+        div.form-example {
+          display: table-row;
+        }
+
+        label,
+        input {
+          display: table-cell;
+          margin-bottom: 10px;
+        }
+
+        label {
+          padding-right: 10px;
+        }
+      </style>
+      <hr/>
+      <div>INSIDE IFRAME</div><br/>
+      <form id="form-example" class="form-example">
+        <div class="form-example">
+          <label for="name">Enter your name: </label>
+          <input type="text" name="name" id="name" required />
+        </div>
+        <div class="form-example">
+          <label for="email">Enter your email: </label>
+          <input type="email" name="email" id="email" required />
+        </div>
+        <div class="form-example">
+          <input type="submit" value="Subscribe!" />
+        </div>
+      </form>
+      <script type="text/javascript">
+        console.log('$$$$$$$$$');
+        let elt = document.createElement('hr');
+        document.body.appendChild(elt);
+
+        elt = document.getElementById("form-example");
+        elt.onsubmit = e => {
+          e.preventDefault();
+          console.log('submitted inside iframe');
+        }
+      </script>
+    </analytics-shield>
+    <div id="scroll">
+      <!-- elements to be populated programatically -->
+    </div>
+  </div>
+</body>
+<script>
+  let el = document.getElementById("2"), data = '';
+  el.onclick = () => alert('click me too');
+  el = document.getElementById("3");
+  el.addEventListener("click", () => alert('click me last'));
+  el = document.getElementById("scroll");
+  for (let i = 0; i !== 200; ++i) data += `<br> line ${i} \n`;
+  el.innerHTML = data;
+  // document.addEventListener('scroll', (event) => console.log('scroll:', window.scrollY, event.target));
+  // document.body.onscroll = (event) => console.log('scroll:', window.scrollY, event.target);
+
+  el = document.getElementById("form-example");
+  el.onsubmit = e => {
+    e.preventDefault();
+  }
+
+  let atBottomContainer = false;
+  document.getElementById("container").onscroll = e => {
+    const el = e.target,
+      threshold = 32,
+      d = el.scrollHeight - el.offsetHeight - el.scrollTop;
+    if (d < threshold && !atBottomContainer) {
+      let node = document.getElementById("last");
+      if (!node) {
+        node = document.createElement('div');
+        node.setAttribute('id', "last");
+        node.innerHTML = "click me end";
+        node.onclick = () => alert('click me finally');
+        el.appendChild(node);
+
+        atBottomContainer = true;
+        console.log('bottom');
+      }
+    } else if (d > threshold + threshold && atBottomContainer) {
+      const node = document.getElementById("last");
+      if (node) {
+        node.remove();
+        atBottomContainer = false;
+        console.log('not at bottom');
+      }
+    }
+  };
+</script>
+
+</html>

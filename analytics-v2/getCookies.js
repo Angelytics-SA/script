@@ -30,4 +30,11 @@ const CRe1 = /\s+;\s+|;\s+|\s+;|;/g,
 // Exports.
 module.exports = (
   cookies, s = cookies && (cookies.cookie || cookies) || DOC.cookie || ''
-) => q(s.split(CRe1).map(m).filter(f).reduce(r, null));
+) => {
+  try {
+    return q(s.split(CRe1).map(m).filter(f).reduce(r, null));
+  }
+  catch {
+    return null;
+  }
+}

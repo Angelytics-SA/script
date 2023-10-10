@@ -1,11 +1,12 @@
 // NODE_ENV=PROD node bundle -i scripts/analytics/index.js -o scripts/analytics/test/bundled.js
 (() => {
-  const { WIN, NS, TAGS, SC, STO, STO_GE, STO_TBC, STO_WN, DOC, DC, IDK, P } = require('./globals');
+  const { WIN, NS, TAGS, SC, STO, STO_GE, STO_TBC, STO_WN, DOC, DC, IDK, P, LOADED } = require('./globals');
   const send = require('./send');
   const getMetadata = require('./getMetadata');
   let sendCustomEvent = () => {};
   const disableCookies = require('./disableCookies');
   const patch = require('./patch');
+  const getChildNodes = require('./getChildNodes');
   // require('./preventScriptLoading')('other', null);
   require('./preventScriptLoading')();
 
@@ -25,7 +26,7 @@
       while (node = queue.pop()) {
 
         // Add children node to the queue.
-        for (i = 0, cn = node.childNodes || [], l = cn.length; i !== l; ++i) queue.push(cn[i]);
+        for (i = 0, cn = getChildNodes(node), l = cn.length; i !== l; ++i) queue.push(cn[i]);
 
         // Change node only if needed.
         if (changedSet && changedSet.has(node[IDK])) continue;
@@ -158,8 +159,6 @@
       sendCustomEvent: sendCustomEvent,
       // To access the tags.
       TAGS: TAGS,
-      // Helper function to disable cookies.
-      disableCookies: disableCookies
     }),
     configurable: false,
     writable: false,
