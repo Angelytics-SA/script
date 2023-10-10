@@ -5,22 +5,26 @@ const FORMS = new Map;
 
 // Hlper function to get the form and its status.
 const getForm = elmt => {
-  // Get parent form.
-  let form = FORMS.get(elmt), tn;
-  if (typeof form === 'boolean') return {
-    form: elmt,
-    started: form
-  };
-  form = elmt;
-  while ((form = form.parentNode)
-    && (tn = (form.tagName || '').toLowerCase()) !== 'form'
-    && tn !== 'body'
-  );
-  FORMS.set(elmt, form);
-  return {
-    form,
-    started: FORMS.get(form)
-  };
+  try {
+    // Get parent form.
+    let form = FORMS.get(elmt), tn;
+    if (typeof form === 'boolean') return {
+      form: elmt,
+      started: form
+    };
+    form = elmt;
+    while ((form = form.parentNode)
+      && (tn = (form.tagName || '').toLowerCase()) !== 'form'
+      && tn !== 'body'
+    );
+    FORMS.set(elmt, form);
+    return {
+      form,
+      started: FORMS.get(form)
+    };
+  } catch {
+    return {};
+  }
 }
 
 // Input event handler.
@@ -34,7 +38,7 @@ const inputEventHandler = ({ target: elmt } = {}) => {
   } = getForm(elmt);
 
   // Start form session.
-  started || (
+  started || (form && (
     record({
       eventName: 'form-start',
       elmt: form,
@@ -42,7 +46,7 @@ const inputEventHandler = ({ target: elmt } = {}) => {
       tags: [TAGS.design, TAGS.sales]
     }),
     FORMS.set(form, true)
-  );
+  ));
 }
 
 // Helper function to get how many fileds are filled.
@@ -75,7 +79,7 @@ const submitEventHandler = ({ target: elmt } = {}) => {
   } = getForm(elmt);
 
   // End form session.
-  started && (
+  started && form && (
     record({
       eventName: 'form-submit',
       elmt: form,

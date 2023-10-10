@@ -19,22 +19,24 @@ createEventHandler = elmt => {
 
   // The record function.
   const f = () => {
-    let w = Math.max((elmt.scrollWidth - (elmt === body && WIN.innerWidth || elmt.clientWidth))),
-      h = Math.max((elmt.scrollHeight - (elmt === body && WIN.innerHeight || elmt.clientHeight))),
-      o;
+    try {
+      let w = Math.max((elmt.scrollWidth - (elmt === body && WIN.innerWidth || elmt.clientWidth))),
+        h = Math.max((elmt.scrollHeight - (elmt === body && WIN.innerHeight || elmt.clientHeight))),
+        o;
 
-    // Get ranges.
-    xmin !== xmax && ((o || (o = {})).horizontalScroll = { range: [p(xmin, w), p(xmax, w)], start: p(xstart, w), end: p(x, w) });
-    ymin !== ymax && ((o || (o = {})).verticalScroll = { range: [p(ymin, h), p(ymax, h)], start: p(ystart, h), end: p(y, h) });
-  
-    // Record if needed, meaning if a scroll really happened.
-    o && record({
-      eventName: 'scroll',
-      elmt,
-      type: 'gesture',
-      tags: [TAGS.design],
-      extra: o
-    });
+      // Get ranges.
+      xmin !== xmax && ((o || (o = {})).horizontalScroll = { range: [p(xmin, w), p(xmax, w)], start: p(xstart, w), end: p(x, w) });
+      ymin !== ymax && ((o || (o = {})).verticalScroll = { range: [p(ymin, h), p(ymax, h)], start: p(ystart, h), end: p(y, h) });
+    
+      // Record if needed, meaning if a scroll really happened.
+      o && record({
+        eventName: 'scroll',
+        elmt,
+        type: 'gesture',
+        tags: [TAGS.design],
+        extra: o
+      });
+    } catch {};
 
     // Reset params.
     xmin = ymin = Infinity;
@@ -44,24 +46,26 @@ createEventHandler = elmt => {
 
   // Return event handler.
   return () => {
-    elmt === body && (
-      x = WIN.scrollX,
-      y = WIN.scrollY
-    ) || (
-      x = elmt.scrollLeft,
-      y = elmt.scrollTop
-    );
+    try {
+      elmt === body && (
+        x = WIN.scrollX,
+        y = WIN.scrollY
+      ) || (
+        x = elmt.scrollLeft,
+        y = elmt.scrollTop
+      );
 
-    xstart === undefined && (
-      xstart = x,
-      ystart = y
-    );
+      xstart === undefined && (
+        xstart = x,
+        ystart = y
+      );
 
-    xmin = Math.min(x, xmin);
-    ymin = Math.min(y, ymin);
-    xmax = Math.max(x, xmax);
-    ymax = Math.max(y, ymax);
-    clearTimeout(timeoutId);
+      xmin = Math.min(x, xmin);
+      ymin = Math.min(y, ymin);
+      xmax = Math.max(x, xmax);
+      ymax = Math.max(y, ymax);
+    } catch {};
+    clearTimeout(timeoutId || 0);
     timeoutId = setTimeout(f, 500); // record only triggered if not scrolled after 500ms
   };
 },
