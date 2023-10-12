@@ -16,16 +16,17 @@
 
     // Crashes and errors.
     if (STO) {
-      const recordCrash = e => {
+      const recordCrash = (e, eventName = 'code', cause = `${eventName} crash`, timeBeforeCrash) => {
+        typeof e !== 'object' && (e = new Error(e || 'unknown', {cause}));
         record({
-          eventName: 'code',
-          error: typeof e === 'object' && e && {
+          eventName,
+          error:  {
             message: e.message,
+            cause: e.cause,
             filename: e.filename,
             line: e.lineno,
-            column: e.colno
-          } || {
-            message: e
+            column: e.colno,
+            timeBeforeCrash: timeBeforeCrash || e.timeBeforeCrash
           },
           type: 'error',
           tags: [TAGS.dev]
@@ -44,7 +45,10 @@
             STO.setItem(STO_GE, 'true');
           } catch (e) {
             // Record error.
-            recordCrash(e);
+            recordCrash(new Error(
+              e,
+              { cause: 'page crashed before being destroyed (beforeunload event)' }
+            ));
           }
 
           // Record session end.
@@ -60,15 +64,13 @@
       // Unresponsive page.
       STO.getItem(STO_WN) === getWindowName()
         && STO.getItem(STO_GE) !== 'true'
-        && record({
-          eventName: 'crash',
-          error: {
-            message: 'Unresponsive code/page',
-            timeBeforeCrash: STO.getItem(STO_TBC)
-          },
-          type: 'error',
-          tags: [TAGS.dev]
-        });
+        && recordCrash(
+          new Error(
+            'Unresponsive code/page',
+            {cause: 'unknown'}
+          ), 
+          'crash', '', STO.getItem(STO_TBC)
+        );
 
       // For page crash.
       try {
@@ -78,7 +80,7 @@
         // To check if tab is duplicated.
         STO.setItem(STO_WN, getWindowName());
       } catch (e) {
-        recordCrash(e);
+        recordCrash(new Error(e, {cause: 'unknown'}));
       }
     }
     
